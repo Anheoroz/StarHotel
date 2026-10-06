@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root {
+  --background: oklch(0.9816 0.0017 247.84);
+  --foreground: oklch(0.2101 0.0318 264.66);
+  --brand: oklch(0.3224 0.1078 12.36);
+  --panel: oklch(0.22 0.015 264);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-panel: var(--panel);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}

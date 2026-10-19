@@ -5,6 +5,10 @@
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "seed": "tsx src/seed.ts",
+    "setup:local": "tsx src/setup-local.ts",
+    "db:local": "node scripts/db-mode.cjs local",
+    "db:atlas": "node scripts/db-mode.cjs atlas",
+    "test": "tsx --test src/tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Unidad } from "../models/unidad";
 import { amenidadesSemilla } from "../data/catalogo";
 import {
   Habitacion,
@@ -10,7 +11,9 @@ import {
 
 export const habitacionesRouter = Router();
 
-const codigosAmenidad = new Set(amenidadesSemilla.map((amenidad) => amenidad.codigo));
+const codigosAmenidad = new Set(
+  amenidadesSemilla.map((amenidad) => amenidad.codigo),
+);
 
 function lista(valor: unknown): string[] {
   if (typeof valor !== "string" || valor.trim() === "") {
@@ -42,7 +45,9 @@ habitacionesRouter.get("/", async (req, res, next) => {
     }
 
     const amenidades = lista(req.query.amenidades);
-    const amenidadesInvalidas = amenidades.filter((codigo) => !codigosAmenidad.has(codigo));
+    const amenidadesInvalidas = amenidades.filter(
+      (codigo) => !codigosAmenidad.has(codigo),
+    );
     if (amenidadesInvalidas.length > 0) {
       res.status(400).json({ error: "Amenidad no válida." });
       return;
@@ -56,11 +61,13 @@ habitacionesRouter.get("/", async (req, res, next) => {
       Number.isNaN(precioMin) ||
       Number.isNaN(precioMax)
     ) {
-      res.status(400).json({ error: "Los filtros numéricos deben ser números." });
+      res
+        .status(400)
+        .json({ error: "Los filtros numéricos deben ser números." });
       return;
     }
 
-    const filtro: Record<string, unknown> = {};
+    const filtro: Record<string, unknown> = { activa: { $ne: false } };
     if (tipos.length > 0) {
       filtro.tipo = { $in: tipos };
     }
@@ -78,8 +85,18 @@ habitacionesRouter.get("/", async (req, res, next) => {
       filtro.precioPorNoche = precio;
     }
 
-    const documentos = await Habitacion.find(filtro).sort({ orden: 1 }).lean<HabitacionDocumento[]>();
+    const documentos = await Habitacion.find(filtro)
+      .sort({ orden: 1 })
+      .lean<HabitacionDocumento[]>();
+    const inventoryExists = await Unidad.exists({});
+    const availableCodes = inventoryExists
+      ? await Unidad.distinct("catalogo", {
+          activa: true,
+          estado: "disponible",
+        })
+      : null;
     const habitaciones = documentos
+      .filter((doc) => !availableCodes || availableCodes.includes(doc.codigo))
       .filter((doc) => {
         if (huespedes === undefined) {
           return true;
@@ -96,7 +113,10 @@ habitacionesRouter.get("/", async (req, res, next) => {
 
 habitacionesRouter.get("/:codigo", async (req, res, next) => {
   try {
-    const documento = await Habitacion.findOne({ codigo: req.params.codigo }).lean<HabitacionDocumento | null>();
+    const documento = await Habitacion.findOne({
+      codigo: req.params.codigo,
+      activa: { $ne: false },
+    }).lean<HabitacionDocumento | null>();
     if (!documento) {
       res.status(404).json({ error: "Habitación no encontrada." });
       return;

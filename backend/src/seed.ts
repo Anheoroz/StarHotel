@@ -1,4 +1,5 @@
-import "dotenv/config";
+import "./env";
+import { assertLocalDatabase } from "./env";
 import { amenidadesSemilla, habitacionesSemilla } from "./data/catalogo";
 import { connectDb, disconnectDb } from "./db";
 import { Amenidad } from "./models/amenidad";
@@ -19,6 +20,7 @@ export async function seedIfEmpty(): Promise<void> {
 }
 
 async function seedDirect(): Promise<void> {
+  assertLocalDatabase();
   await connectDb();
   await Amenidad.deleteMany({});
   await Habitacion.deleteMany({});

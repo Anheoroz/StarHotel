@@ -28,15 +28,19 @@ export function Gallery({ photos, name, rounded = false }: GalleryProps) {
 
   return (
     <div
-      className={`relative aspect-[16/10] overflow-hidden bg-zinc-100 ${rounded ? "rounded-2xl" : ""}`}
+      className={`relative overflow-hidden bg-zinc-100 ${rounded ? "aspect-[16/8] rounded-lg" : "h-[240px]"}`}
     >
       <Image
         src={current}
         alt={`${name} — foto ${index + 1} de ${total}`}
         fill
         className="object-cover"
-        sizes="(max-width: 768px) 100vw, 720px"
-        priority={index === 0}
+        sizes={
+          rounded
+            ? "(max-width: 1152px) 100vw, 1152px"
+            : "(max-width: 768px) 100vw, 600px"
+        }
+        unoptimized
       />
       <button
         type="button"

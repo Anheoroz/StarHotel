@@ -4,6 +4,8 @@ Sistema de catálogo y reservas de habitaciones. Un visitante explora las habita
 
 La primera etapa entrega el catálogo: listado, filtros y ficha de habitación, con los datos guardados en MongoDB. La referencia visual es el prototipo [star-hotel-catalog.lovable.app](https://star-hotel-catalog.lovable.app/).
 
+El **Sprint 3** tiene una base independiente **`starthotel_db` en MongoDB Atlas** para la demo. Consulta [docs/atlas.md](docs/atlas.md) para ejecutar el proyecto, elegir Atlas o local y compartir la configuración y las cuatro cuentas por privado. La base anterior `starhotel` se conserva.
+
 ## Qué incluye ahora
 
 - Encabezado con accesos a Inicio y Habitaciones.
@@ -11,15 +13,18 @@ La primera etapa entrega el catálogo: listado, filtros y ficha de habitación, 
 - Filtros por fecha, huéspedes, tipo, precio y amenidades.
 - Detalle con galería, descripción, servicios y selección de fechas.
 - API que sirve el catálogo desde MongoDB.
+- Registro, inicio/cierre de sesión y acceso por rol.
+- Panel administrativo de catálogo, fotos, precios y 60 habitaciones físicas de demostración.
+- Retiro temporal de habitaciones sin borrarlas y consulta de estados para recepción y mantenimiento.
 
-La reserva todavía no se guarda. Cuentas, panel administrativo, pagos y disponibilidad real por fechas vienen en etapas siguientes.
+La reserva todavía no se guarda. Temporadas, pagos, disponibilidad real por fechas y operaciones de estancia vienen en las tareas siguientes del backlog.
 
 ## Estructura
 
 ```text
 frontend/   Next.js. Catálogo que consume la API.
 backend/    API en Node.js y modelos de MongoDB.
-docs/       Reporte de la primera entrega.
+docs/       Guía compartida de ejecución y conexión a Atlas.
 ```
 
 ## Tecnologías
@@ -33,21 +38,25 @@ docs/       Reporte de la primera entrega.
 
 ## Cómo ejecutarlo
 
-Hacen falta Node.js y Docker.
+Para la demo con Atlas, sigue [docs/atlas.md](docs/atlas.md): solo hace falta Node.js y los dos archivos privados del equipo.
+
+Los pasos siguientes son para la modalidad local, que requiere Node.js y Docker.
 
 En una terminal, levanta la base y la API:
 
 ```bash
 cd backend
-docker compose up -d
+cp .env.local.example .env.local
+docker compose -f docker-compose.local.yml up -d
 npm install
+npm run setup:local
 npm run dev
 ```
 
-La API queda en http://localhost:4000. Si la base está vacía, carga sola las 6 habitaciones y las 10 amenidades. Para volver a cargarlas:
+La API queda en http://localhost:4000. El entorno local usa el puerto MongoDB 27018 y la base `starhotel_sprint3`, separada de Atlas. Para preparar los datos de demostración sin sobrescribir los existentes:
 
 ```bash
-npm run seed
+npm run setup:local
 ```
 
 En otra terminal, el catálogo:
@@ -60,13 +69,14 @@ npm run dev
 
 Abre http://localhost:3000. Un detalle de ejemplo es http://localhost:3000/habitacion/sencilla.
 
-`backend/.env` usa MongoDB local:
+`backend/.env.local` selecciona MongoDB local y tiene prioridad sobre `.env`:
 
 ```text
-MONGODB_URI=mongodb://127.0.0.1:27017/starhotel
+MONGODB_URI=mongodb://127.0.0.1:27018/starhotel_sprint3
+REQUIRE_LOCAL_DB=true
 ```
 
-Para MongoDB Atlas, sustituye esa variable por la cadena del cluster. El formato está en `backend/.env.example`.
+El `.env` existente se conserva; no se modifica Atlas para probar este sprint. Ambos archivos privados están excluidos de Git. Las variables ya exportadas en la terminal tienen prioridad sobre los archivos.
 
 ## API
 

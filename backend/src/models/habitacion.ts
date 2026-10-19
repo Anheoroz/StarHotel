@@ -19,6 +19,7 @@ const habitacionSchema = new Schema(
     fotos: { type: [String], required: true },
     descripcion: { type: String, required: true },
     orden: { type: Number, required: true },
+    activa: { type: Boolean, required: true, default: true },
   },
   { collection: "habitaciones", versionKey: false },
 );
@@ -51,7 +52,9 @@ export type HabitacionRespuesta = {
   descripcion: string;
 };
 
-export function toHabitacionRespuesta(doc: HabitacionDocumento): HabitacionRespuesta {
+export function toHabitacionRespuesta(
+  doc: HabitacionDocumento,
+): HabitacionRespuesta {
   return {
     id: doc.codigo,
     nombre: doc.nombre,

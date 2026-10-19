@@ -20,3 +20,36 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+@layer components {
+  .field-label {
+    @apply grid gap-1.5 text-sm font-medium;
+  }
+  .field {
+    @apply min-w-0 w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15;
+  }
+  .btn-primary {
+    @apply rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-wait disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium transition hover:bg-zinc-50 disabled:opacity-50;
+  }
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+button:not(:disabled),
+select {
+  cursor: pointer;
+}
+input[type="checkbox"] {
+  accent-color: var(--brand);
+}
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}

@@ -9,7 +9,7 @@ export function ReservationBar() {
 
   return (
     <form
-      className="fixed inset-x-0 bottom-0 z-20 bg-panel px-4 py-4 text-white"
+      className="fixed inset-x-0 bottom-0 z-20 bg-[#1A2530] px-4 py-5 text-white"
       onSubmit={(event) => {
         event.preventDefault();
         if (!checkIn || !checkOut) {
@@ -23,7 +23,7 @@ export function ReservationBar() {
         setMessage("Fechas seleccionadas. La reserva todavía no se guarda.");
       }}
     >
-      <div className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 items-end gap-4 md:grid-cols-[1fr_1fr_auto]">
         <label className="grid gap-1 text-sm">
           Fecha de inicio
           <input
@@ -31,7 +31,7 @@ export function ReservationBar() {
             name="fechaInicio"
             value={checkIn}
             onChange={(event) => setCheckIn(event.target.value)}
-            className="rounded-lg bg-white px-3 py-2 text-foreground"
+            className="rounded-md bg-white px-3 py-2 text-foreground"
           />
         </label>
         <label className="grid gap-1 text-sm">
@@ -41,16 +41,20 @@ export function ReservationBar() {
             name="fechaFinal"
             value={checkOut}
             onChange={(event) => setCheckOut(event.target.value)}
-            className="rounded-lg bg-white px-3 py-2 text-foreground"
+            className="rounded-md bg-white px-3 py-2 text-foreground"
           />
         </label>
         <button
           type="submit"
-          className="rounded-lg bg-brand px-4 py-3 text-base font-semibold text-white sm:col-span-2"
+          className="rounded-md bg-brand px-4 py-3 text-base font-semibold text-white col-span-2 md:col-span-1"
         >
           Reservar
         </button>
-        {message ? <p className="text-sm text-zinc-200 sm:col-span-2">{message}</p> : null}
+        {message ? (
+          <p className="text-sm text-zinc-200 col-span-2 md:col-span-1">
+            {message}
+          </p>
+        ) : null}
       </div>
     </form>
   );

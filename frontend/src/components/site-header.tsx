@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountNav } from "@/components/account-nav";
 import { BedIcon, BuildingIcon, HomeIcon } from "@/components/icons";
 
 type SiteHeaderProps = {
@@ -7,27 +8,33 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ title = "HOTEL 5 ESTRELLAS" }: SiteHeaderProps) {
   return (
-    <header className="border-b border-zinc-200 bg-white">
-      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">
+      <div className="mx-auto flex min-h-16 max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-semibold tracking-wide text-brand sm:text-base"
+          className="flex items-center gap-2 text-sm font-bold tracking-wide text-brand sm:text-xl"
         >
           <BuildingIcon />
           <span>{title}</span>
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link href="/" className="flex items-center gap-1.5 font-medium text-brand">
+        <nav className="flex items-center gap-2 text-sm">
+          <Link
+            href="/"
+            aria-label="Inicio"
+            className="flex items-center gap-1.5 px-2 py-2 font-medium text-brand"
+          >
             <HomeIcon />
-            Inicio
+            <span className="hidden sm:inline">Inicio</span>
           </Link>
           <Link
             href="/#habitaciones"
-            className="flex items-center gap-1.5 font-medium text-zinc-500"
+            aria-label="Habitaciones"
+            className="flex items-center gap-1.5 px-2 py-2 font-medium text-zinc-500"
           >
             <BedIcon />
-            Habitaciones
+            <span className="hidden sm:inline">Habitaciones</span>
           </Link>
+          <AccountNav />
         </nav>
       </div>
     </header>

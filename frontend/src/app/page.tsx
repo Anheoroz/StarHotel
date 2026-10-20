@@ -1,31 +1,38 @@
+import { Suspense } from "react";
 import { Catalog } from "@/components/catalog";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { fetchRooms } from "@/lib/api";
 
-export default async function HomePage() {
-  let rooms;
+async function RoomCatalog() {
   try {
-    rooms = await fetchRooms();
+    const rooms = await fetchRooms();
+    return <Catalog rooms={rooms} />;
   } catch {
     return (
-      <>
-        <SiteHeader />
-        <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-          <h1 className="text-2xl font-semibold">No se pudo cargar el catálogo</h1>
-          <p className="mt-3 text-zinc-500">
-            La API tiene que estar en marcha en el puerto 4000.
-          </p>
-        </main>
-      </>
+      <p className="mx-auto max-w-3xl px-4 py-16 text-center text-zinc-500">
+        El servicio de habitaciones no está disponible.
+      </p>
     );
   }
+}
 
+export default function HomePage() {
   return (
     <>
       <SiteHeader />
-      <main>
-        <Catalog rooms={rooms} />
+      <main className="min-h-screen">
+        <Suspense
+          fallback={
+            <p className="mx-auto max-w-6xl px-5 py-16 text-center text-stone-500">
+              Cargando habitaciones…
+            </p>
+          }
+        >
+          <RoomCatalog />
+        </Suspense>
       </main>
+      <SiteFooter />
     </>
   );
 }

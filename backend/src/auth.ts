@@ -1,118 +1,57 @@
-import {
-  createHash,
-  randomBytes,
-  scrypt as scryptCallback,
-  timingSafeEqual,
-} from "node:crypto";
-import { promisify } from "node:util";
 import type { NextFunction, Request, Response } from "express";
-import { Sesion, Usuario, type Rol } from "./models/usuario";
-import { HttpError } from "./http";
+import jwt from "jsonwebtoken";
+import type { Rol } from "./models/usuario";
 
-const scrypt = promisify(scryptCallback);
-export const COOKIE = "starhotel_session";
-export const SESSION_MS = 8 * 60 * 60 * 1000;
-export const cookieOptions = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  path: "/",
+export type Sesion = {
+  sub: string;
+  nombre: string;
+  correo: string;
+  rol: Rol;
 };
 
-export type Cuenta = { id: string; nombre: string; correo: string; rol: Rol };
-declare global {
-  namespace Express {
-    interface Request {
-      cuenta?: Cuenta;
-    }
+type RequestConSesion = Request & { usuario?: Sesion };
+
+function secreto(): string {
+  const valor = process.env.JWT_SECRET;
+  if (!valor) {
+    throw new Error("Falta JWT_SECRET.");
+  }
+  return valor;
+}
+
+export function firmarSesion(sesion: Sesion): string {
+  return jwt.sign(sesion, secreto(), { expiresIn: "12h" });
+}
+
+export function leerSesion(req: Request): Sesion | undefined {
+  const encabezado = req.headers.authorization;
+  if (!encabezado?.startsWith("Bearer ")) {
+    return undefined;
+  }
+  try {
+    return jwt.verify(encabezado.slice("Bearer ".length), secreto()) as Sesion;
+  } catch {
+    return undefined;
   }
 }
 
-export function digest(value: string) {
-  return createHash("sha256").update(value).digest("hex");
+export function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  const sesion = leerSesion(req);
+  if (!sesion) {
+    res.status(401).json({ error: "Debes iniciar sesión." });
+    return;
+  }
+  (req as RequestConSesion).usuario = sesion;
+  next();
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16).toString("hex");
-  const key = (await scrypt(password, salt, 64)) as Buffer;
-  return `scrypt:${salt}:${key.toString("hex")}`;
-}
-
-export async function checkPassword(
-  password: string,
-  stored: string,
-): Promise<boolean> {
-  const [format, salt, hash] = stored.split(":");
-  if (format !== "scrypt" || !salt || !hash) return false;
-  const expected = Buffer.from(hash, "hex");
-  const key = (await scrypt(password, salt, 64)) as Buffer;
-  return expected.length === key.length && timingSafeEqual(expected, key);
-}
-
-export function tokenFrom(req: Request): string {
-  const entry = req.headers.cookie
-    ?.split(";")
-    .map((v) => v.trim())
-    .find((v) => v.startsWith(`${COOKIE}=`));
-  return entry?.slice(COOKIE.length + 1) ?? "";
-}
-
-export async function createSession(userId: unknown, res: Response) {
-  const token = randomBytes(32).toString("hex");
-  await Sesion.create({
-    usuario: userId,
-    tokenHash: digest(token),
-    expira: new Date(Date.now() + SESSION_MS),
-  });
-  res.cookie(COOKIE, token, { ...cookieOptions, maxAge: SESSION_MS });
-}
-
-export function requireAuth(req: Request, _res: Response, next: NextFunction) {
-  (async () => {
-    const token = tokenFrom(req);
-    if (!token) throw new HttpError(401, "Inicia sesión para continuar.");
-    const session = await Sesion.findOne({
-      tokenHash: digest(token),
-      expira: { $gt: new Date() },
-    });
-    const user = session ? await Usuario.findById(session.usuario) : null;
-    if (!user)
-      throw new HttpError(401, "La sesión venció. Inicia sesión nuevamente.");
-    req.cuenta = {
-      id: String(user._id),
-      nombre: user.nombre,
-      correo: user.correo,
-      rol: user.rol as Rol,
-    };
-  })().then(() => next(), next);
-}
-
-export function requireRoles(...roles: Rol[]) {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    if (!req.cuenta || !roles.includes(req.cuenta.rol))
-      return next(
-        new HttpError(403, "No tienes permisos para realizar esta acción."),
-      );
+export function requireRole(...roles: Rol[]) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const sesion = (req as RequestConSesion).usuario;
+    if (!sesion || !roles.includes(sesion.rol)) {
+      res.status(403).json({ error: "No tienes permiso para esta acción." });
+      return;
+    }
     next();
   };
-}
-
-// Límite por IP en operaciones de autenticación; se limpia para evitar crecimiento indefinido.
-const attempts = new Map<string, { count: number; reset: number }>();
-export function authLimit(req: Request, _res: Response, next: NextFunction) {
-  const now = Date.now();
-  for (const [key, value] of attempts)
-    if (value.reset < now) attempts.delete(key);
-  const key = req.ip ?? "local";
-  const bucket = attempts.get(key) ?? { count: 0, reset: now + 15 * 60 * 1000 };
-  bucket.count++;
-  attempts.set(key, bucket);
-  next(
-    bucket.count > 40
-      ? new HttpError(
-          429,
-          "Demasiados intentos. Intenta nuevamente en 15 minutos.",
-        )
-      : undefined,
-  );
 }

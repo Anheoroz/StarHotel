@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(0.9816 0.0017 247.84);
-  --foreground: oklch(0.2101 0.0318 264.66);
-  --brand: oklch(0.3224 0.1078 12.36);
-  --panel: oklch(0.22 0.015 264);
+  --background: #f6f3ee;
+  --foreground: #1a1a1a;
+  --brand: #6b2430;
+  --panel: #1a1a1a;
+  --line: #e4dfd6;
 }
 
 @theme inline {
@@ -12,44 +13,77 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-panel: var(--panel);
-  --font-sans: var(--font-geist-sans);
+  --color-line: var(--line);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bodoni), Georgia, "Times New Roman", serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
-@layer components {
-  .field-label {
-    @apply grid gap-1.5 text-sm font-medium;
+@keyframes kenburns {
+  from {
+    transform: scale(1.14);
   }
-  .field {
-    @apply min-w-0 w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15;
-  }
-  .btn-primary {
-    @apply rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-wait disabled:opacity-50;
-  }
-  .btn-secondary {
-    @apply rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium transition hover:bg-zinc-50 disabled:opacity-50;
+  to {
+    transform: scale(1);
   }
 }
-button,
-a,
-input,
-select,
-textarea {
-  touch-action: manipulation;
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-button:not(:disabled),
-select {
-  cursor: pointer;
+
+.kenburns {
+  animation: kenburns 18s ease-out both;
 }
-input[type="checkbox"] {
-  accent-color: var(--brand);
+
+.rise-in {
+  animation: rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
+
+.rise-wait {
+  opacity: 0;
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -0.4rem;
+  left: 0;
+  height: 1px;
+  background: var(--brand);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns,
+  .rise-in {
+    animation: none;
+  }
+
+  .rise-wait {
+    opacity: 1;
+  }
 }

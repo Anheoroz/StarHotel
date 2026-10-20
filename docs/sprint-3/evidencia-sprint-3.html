@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Evidencia Sprint 3 — Star Hotel</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0 auto; max-width: 920px; padding: 2.5rem 1.5rem 4rem; font-family: Georgia, "Times New Roman", serif; color: #1c1917; line-height: 1.5; background: #f6f3ee; }
+    h1, h2 { font-family: "Avenir Next", "Segoe UI", sans-serif; color: #6b2430; }
+    h1 { font-size: 2rem; margin-bottom: 0.2rem; }
+    h2 { margin-top: 2.4rem; border-bottom: 1px solid #e4dfd6; padding-bottom: 0.3rem; }
+    .meta { color: #57534e; margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 0.95rem; background: #fff; }
+    th, td { border: 1px solid #e4dfd6; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #fff; }
+    figure { margin: 1.2rem 0 1.8rem; }
+    img { width: 100%; border: 1px solid #e4dfd6; background: #fff; }
+    figcaption { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 0.9rem; color: #44403c; margin-top: 0.4rem; }
+    code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+    @media print { body { max-width: none; background: #fff; } h2 { break-after: avoid; } figure { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <h1>Evidencia del Sprint 3</h1>
+  <p class="meta">Star Hotel · Grupo No1 · 19 de octubre de 2026</p>
+  <p>Tareas del Sprint 3 de Star Hotel. Comprende el registro y el inicio de sesión, el acceso de cada perfil a su propia pantalla, y la administración de habitaciones: alta, edición, habilitación, fotografías, descripción y precio.</p>
+
+  <h2>Lo pedido y el resultado</h2>
+  <table>
+    <tr><th>Historia</th><th>Clave</th><th>Lo que se pidió</th><th>Resultado</th></tr>
+    <tr><td>AUT-1</td><td>SCRUM-26</td><td>Registrar e iniciar sesión, con validación y rechazo de credenciales inválidas</td><td>Realizado</td></tr>
+    <tr><td>AUT-2</td><td>SCRUM-27</td><td>Que cada rol vea solo sus acciones</td><td>Realizado</td></tr>
+    <tr><td>ADM-1</td><td>SCRUM-28</td><td>Alta, edición y estado, sin borrar la habitación</td><td>Realizado</td></tr>
+    <tr><td>ADM-2</td><td>SCRUM-29</td><td>Fotografías, descripción y precio</td><td>Realizado</td></tr>
+  </table>
+  <h2>AUT-1. Registrar e iniciar sesión</h2>
+  <p>Se puede crear una cuenta con nombre, correo y contraseña. Si falta el nombre, el registro no continúa y muestra «El nombre es obligatorio.». Si el correo o la contraseña no coinciden, la persona se queda en la misma pantalla y ve «Correo o contraseña incorrectos.». Un ingreso válido abre el catálogo, que es la pantalla principal, y el menú identifica el perfil.</p>
+  <figure>
+    <img src="capturas/06-registro.png" alt="Formulario de registro con nombre, correo y contraseña">
+    <figcaption>Figura 1. Registro con los datos que pidió la historia.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/07-validacion.png" alt="Mensaje: el nombre es obligatorio">
+    <figcaption>Figura 2. Un dato obligatorio vacío detiene el registro y explica el motivo.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/08-sesion.png" alt="Formulario de inicio de sesión">
+    <figcaption>Figura 3. Inicio de sesión con correo y contraseña.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/09-credenciales.png" alt="Mensaje de correo o contraseña incorrectos">
+    <figcaption>Figura 4. Credenciales inválidas, rechazadas sin salir de la pantalla.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/10-sesion-admin.png" alt="Menú con Panel y Salir Administración">
+    <figcaption>Figura 5. El ingreso válido llega al catálogo y el menú muestra el perfil Administración.</figcaption>
+  </figure>
+
+  <h2>AUT-2. Control de acceso por rol</h2>
+  <p>Se puede distinguir administrador, recepción y mantenimiento. El registro público crea un huésped y ese perfil no entra al panel. Recepción consulta nombre, tipo, estado y precio, sin botones para cambiar nada. Mantenimiento ve solo si la habitación está habilitada o deshabilitada.</p>
+  <figure>
+    <img src="capturas/14-recepcion.png" alt="Panel de recepción sin botones de edición">
+    <figcaption>Figura 6. Recepción consulta el inventario y no puede editarlo.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/15-mantenimiento.png" alt="Panel de mantenimiento solo con el estado">
+    <figcaption>Figura 7. Mantenimiento ve el estado, sin precio ni edición.</figcaption>
+  </figure>
+
+  <h2>ADM-1. Alta, edición y estado</h2>
+  <p>El administrador puede crear una habitación con código, nombre y tipo, y editar una que ya existe. Puede habilitarla o deshabilitarla. El registro no se borra. «Habitación QA editada» está deshabilitada y no sale en el catálogo público.</p>
+  <figure>
+    <img src="capturas/04-habitaciones.png" alt="Catálogo público de habitaciones">
+    <figcaption>Figura 8. El catálogo público lista las habitaciones habilitadas, con foto y precio.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/11-panel-admin.png" alt="Panel de administración con alta y listado">
+    <figcaption>Figura 9. Alta de habitación. La de prueba sigue en la lista, marcada como deshabilitada.</figcaption>
+  </figure>
+  <figure>
+    <img src="capturas/12-editar.png" alt="Edición de nombre, tipo, descripción, precio y estado">
+    <figcaption>Figura 10. Edición de la misma habitación. La casilla Habilitada está sin marcar y el registro sigue existiendo.</figcaption>
+  </figure>
+
+  <h2>ADM-2. Fotografías, descripción y precio</h2>
+  <p>En la misma ficha el administrador puede cambiar la descripción, el precio y las fotografías. El control de archivo abre el Finder, muestra el nombre del archivo elegido y permite agregarlo. También puede pegar una dirección de imagen o crear una cuenta de personal. Esas acciones son solo de administración.</p>
+  <figure>
+    <img src="capturas/13-fotografias.png" alt="Control para elegir una fotografía, con el archivo ya seleccionado">
+    <figcaption>Figura 11. El administrador elige una fotografía. El control muestra el archivo elegido.</figcaption>
+  </figure>
+
+  <h2>Cuentas para verificar</h2>
+  <table>
+    <tr><th>Rol</th><th>Correo</th><th>Contraseña</th></tr>
+    <tr><td>Administrador</td><td>admin@starhotel.com</td><td>Admin1234!</td></tr>
+    <tr><td>Recepción</td><td>recepcion@starhotel.com</td><td>Recepcion1234!</td></tr>
+    <tr><td>Mantenimiento</td><td>mantenimiento@starhotel.com</td><td>Mantenimiento1234!</td></tr>
+  </table>
+</body>
+</html>

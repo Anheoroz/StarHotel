@@ -1,22 +1,44 @@
-import "./env";
-import { app } from "./app";
+import "dotenv/config";
+import cors from "cors";
+import express from "express";
+import path from "node:path";
 import { connectDb } from "./db";
+import { amenidadesRouter } from "./routes/amenidades";
+import { authRouter, usuariosRouter } from "./routes/auth";
+import { baseRouter } from "./routes/base";
+import { habitacionesRouter } from "./routes/habitaciones";
 import { seedIfEmpty } from "./seed";
 
-async function main() {
+const app = express();
+const port = Number(process.env.PORT ?? 4000);
+
+app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:3000" }));
+app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true, servicio: "star-hotel-api" });
+});
+app.use("/api/base", baseRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/usuarios", usuariosRouter);
+app.use("/api/amenidades", amenidadesRouter);
+app.use("/api/habitaciones", habitacionesRouter);
+
+app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(error);
+  res.status(500).json({ error: "Error interno del servidor." });
+});
+
+async function main(): Promise<void> {
   await connectDb();
   await seedIfEmpty();
-  const port = Number(process.env.PORT ?? 4000);
-  app.listen(port, () =>
-    console.log(
-      `API en http://localhost:${port} (${process.env.REQUIRE_LOCAL_DB === "true" ? "MongoDB local" : "base configurada"})`,
-    ),
-  );
+  app.listen(port, () => {
+    console.log(`API en http://localhost:${port}`);
+  });
 }
+
 main().catch((error: unknown) => {
-  console.error(
-    "No se pudo iniciar la API:",
-    error instanceof Error ? error.name : "Error",
-  );
+  console.error(error);
   process.exit(1);
 });

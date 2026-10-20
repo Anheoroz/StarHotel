@@ -1,9 +1,10 @@
-import "./env";
-import { assertLocalDatabase } from "./env";
+import "dotenv/config";
 import { amenidadesSemilla, habitacionesSemilla } from "./data/catalogo";
 import { connectDb, disconnectDb } from "./db";
 import { Amenidad } from "./models/amenidad";
 import { Habitacion } from "./models/habitacion";
+import { Usuario } from "./models/usuario";
+import bcrypt from "bcryptjs";
 
 export async function seedIfEmpty(): Promise<void> {
   const [habitaciones, amenidades] = await Promise.all([
@@ -15,12 +16,31 @@ export async function seedIfEmpty(): Promise<void> {
     await Amenidad.insertMany(amenidadesSemilla);
   }
   if (habitaciones === 0) {
-    await Habitacion.insertMany(habitacionesSemilla);
+    await Habitacion.insertMany(habitacionesSemilla.map((habitacion) => ({ ...habitacion, activa: true })));
+  }
+  await Habitacion.updateMany({ activa: { $exists: false } }, { $set: { activa: true } });
+
+  const cuentas = await Usuario.countDocuments();
+  if (cuentas === 0) {
+    const personal = [
+      { nombre: "Administración", correo: "admin@starhotel.com", contrasena: "Admin1234!", rol: "administrador" },
+      { nombre: "Recepción", correo: "recepcion@starhotel.com", contrasena: "Recepcion1234!", rol: "recepcion" },
+      { nombre: "Mantenimiento", correo: "mantenimiento@starhotel.com", contrasena: "Mantenimiento1234!", rol: "mantenimiento" },
+    ];
+    await Usuario.insertMany(
+      await Promise.all(
+        personal.map(async (cuenta) => ({
+          nombre: cuenta.nombre,
+          correo: cuenta.correo,
+          rol: cuenta.rol,
+          contrasenaHash: await bcrypt.hash(cuenta.contrasena, 10),
+        })),
+      ),
+    );
   }
 }
 
 async function seedDirect(): Promise<void> {
-  assertLocalDatabase();
   await connectDb();
   await Amenidad.deleteMany({});
   await Habitacion.deleteMany({});

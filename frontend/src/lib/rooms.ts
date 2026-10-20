@@ -27,6 +27,7 @@ export type Room = {
   amenidades: AmenityId[];
   fotos: string[];
   descripcion: string;
+  activa: boolean;
 };
 
 export const AMENITY_LABELS: Record<AmenityId, string> = {

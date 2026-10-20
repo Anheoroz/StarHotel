@@ -9,7 +9,7 @@ export function ReservationBar() {
 
   return (
     <form
-      className="fixed inset-x-0 bottom-0 z-20 bg-panel px-4 py-4 text-white"
+      className="mt-8 border border-line bg-white"
       onSubmit={(event) => {
         event.preventDefault();
         if (!checkIn || !checkOut) {
@@ -20,37 +20,34 @@ export function ReservationBar() {
           setMessage("La fecha final debe ser posterior a la de inicio.");
           return;
         }
-        setMessage("Fechas seleccionadas. La reserva todavía no se guarda.");
+        setMessage("Fechas seleccionadas.");
       }}
     >
-      <div className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-2">
-        <label className="grid gap-1 text-sm">
-          Fecha de inicio
+      <div className="grid gap-4 p-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+        <label className="grid gap-1 text-[0.68rem] tracking-[0.16em] text-stone-500 uppercase">
+          Llegada
           <input
             type="date"
             name="fechaInicio"
             value={checkIn}
             onChange={(event) => setCheckIn(event.target.value)}
-            className="rounded-lg bg-white px-3 py-2 text-foreground"
+            className="border border-line px-3 py-2 text-base tracking-normal text-black"
           />
         </label>
-        <label className="grid gap-1 text-sm">
-          Fecha final
+        <label className="grid gap-1 text-[0.68rem] tracking-[0.16em] text-stone-500 uppercase">
+          Salida
           <input
             type="date"
             name="fechaFinal"
             value={checkOut}
             onChange={(event) => setCheckOut(event.target.value)}
-            className="rounded-lg bg-white px-3 py-2 text-foreground"
+            className="border border-line px-3 py-2 text-base tracking-normal text-black"
           />
         </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-brand px-4 py-3 text-base font-semibold text-white sm:col-span-2"
-        >
+        <button type="submit" className="bg-brand px-6 py-3 text-[0.72rem] tracking-[0.16em] text-white uppercase">
           Reservar
         </button>
-        {message ? <p className="text-sm text-zinc-200 sm:col-span-2">{message}</p> : null}
+        {message ? <p className="text-sm text-stone-600 md:col-span-3">{message}</p> : null}
       </div>
     </form>
   );

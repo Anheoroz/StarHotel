@@ -28,14 +28,14 @@ export function Gallery({ photos, name, rounded = false }: GalleryProps) {
 
   return (
     <div
-      className={`relative aspect-[16/10] overflow-hidden bg-zinc-100 ${rounded ? "rounded-2xl" : ""}`}
+      className={`relative aspect-[16/10] overflow-hidden bg-stone-200 ${rounded ? "rounded-none" : ""}`}
     >
       <Image
         src={current}
         alt={`${name} — foto ${index + 1} de ${total}`}
         fill
-        className="object-cover"
-        sizes="(max-width: 768px) 100vw, 720px"
+        className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+        sizes="(max-width: 768px) 100vw, 640px"
         priority={index === 0}
       />
       <button

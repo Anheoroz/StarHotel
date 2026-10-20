@@ -32,7 +32,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
 
   return (
     <form
-      className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5"
+      className="mt-6 border border-line bg-white p-5"
       onSubmit={(event) => {
         event.preventDefault();
         onApply();
@@ -46,7 +46,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
             type="date"
             value={value.checkIn}
             onChange={(event) => onChange({ ...value, checkIn: event.target.value })}
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="border border-line px-3 py-2"
           />
         </label>
         <label className="grid gap-1 text-sm">
@@ -55,7 +55,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
             type="date"
             value={value.checkOut}
             onChange={(event) => onChange({ ...value, checkOut: event.target.value })}
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="border border-line px-3 py-2"
           />
         </label>
         <label className="grid gap-1 text-sm sm:col-span-2">
@@ -65,7 +65,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
             min={1}
             value={value.guests}
             onChange={(event) => onChange({ ...value, guests: event.target.value })}
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="border border-line px-3 py-2"
           />
         </label>
       </div>
@@ -96,7 +96,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
               min={0}
               value={value.minPrice}
               onChange={(event) => onChange({ ...value, minPrice: event.target.value })}
-              className="rounded-lg border border-zinc-300 px-3 py-2"
+              className="border border-line px-3 py-2"
             />
           </label>
           <label className="grid gap-1 text-sm">
@@ -106,7 +106,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
               min={0}
               value={value.maxPrice}
               onChange={(event) => onChange({ ...value, maxPrice: event.target.value })}
-              className="rounded-lg border border-zinc-300 px-3 py-2"
+              className="border border-line px-3 py-2"
             />
           </label>
         </div>
@@ -130,7 +130,7 @@ export function RoomFiltersForm({ value, onChange, onApply }: RoomFiltersFormPro
 
       <button
         type="submit"
-        className="mt-5 w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white"
+        className="mt-5 w-full bg-brand px-4 py-3 text-[0.72rem] tracking-[0.16em] text-white uppercase"
       >
         Aplicar filtros
       </button>

@@ -1,24 +1,31 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Bodoni_Moda, Outfit } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+});
+
+const display = Bodoni_Moda({
+  variable: "--font-bodoni",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Habitaciones disponibles — Hotel 5 Estrellas",
-    template: "%s — Hotel 5 Estrellas",
+    default: "Star Hotel",
+    template: "%s — Star Hotel",
   },
-  description:
-    "Catálogo de habitaciones de Star Hotel. Filtra por fecha, huéspedes, precio y amenidades.",
+  description: "Star Hotel, en Zona 10 de la Ciudad de Guatemala. Habitaciones, tarifas y servicios.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="es" className={`${outfit.variable} ${display.variable} h-full scroll-smooth antialiased`}>
       <body className="min-h-full">{children}</body>
     </html>
   );

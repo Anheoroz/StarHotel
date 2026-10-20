@@ -1,56 +1,63 @@
 # Star Hotel
 
-Sistema de catálogo y reservas de habitaciones. Un visitante explora las habitaciones del hotel, las filtra y abre el detalle de cada una antes de reservar.
+Star Hotel es el sistema de catálogo y reservas del hotel. Permite consultar habitaciones, compararlas por fecha, capacidad, precio y servicios, y revisar la ficha de cada una antes de confirmar una estadía.
 
-La primera etapa entrega el catálogo: listado, filtros y ficha de habitación, con los datos guardados en MongoDB. La referencia visual es el prototipo [star-hotel-catalog.lovable.app](https://star-hotel-catalog.lovable.app/).
+## Producto
 
-## Qué incluye ahora
+El catálogo público presenta seis tipos de habitación, con fotografía, capacidad, amenidades y tarifa por noche en quetzales. El visitante filtra la oferta y abre el detalle, donde encuentra la galería, la descripción, los servicios y la selección de fechas.
 
-- Encabezado con accesos a Inicio y Habitaciones.
-- Seis tipos de habitación, de Q85 a Q260 por noche, con foto, capacidad y amenidades.
-- Filtros por fecha, huéspedes, tipo, precio y amenidades.
-- Detalle con galería, descripción, servicios y selección de fechas.
-- API que sirve el catálogo desde MongoDB.
+| Habitación | Tipo | Capacidad | Tarifa |
+|---|---|---|---:|
+| Habitación Sencilla | Sencilla | 1 adulto, 1 niño | Q85 |
+| Habitación Sencilla Deluxe | Sencilla | 1 adulto, 1 niño | Q110 |
+| Habitación Doble | Doble | 2 adultos, 2 niños | Q130 |
+| Habitación Ejecutiva | Sencilla | 1 adulto | Q150 |
+| Habitación Doble Vista al Mar | Doble | 2 adultos, 2 niños | Q195 |
+| Suite Familiar | Suite | 4 adultos, 3 niños | Q260 |
 
-La reserva todavía no se guarda. Cuentas, panel administrativo, pagos y disponibilidad real por fechas vienen en etapas siguientes.
-
-## Estructura
+## Arquitectura
 
 ```text
-frontend/   Next.js. Catálogo que consume la API.
-backend/    API en Node.js y modelos de MongoDB.
-docs/       Reporte de la primera entrega.
+frontend/   Aplicación web del catálogo y del panel
+backend/    API de cuentas, habitaciones y amenidades
+docs/       Documentación del proyecto
 ```
 
-## Tecnologías
+La aplicación web consulta la API. La API persiste el catálogo y las cuentas en MongoDB Atlas, base `starhotel`. Las fotografías cargadas desde el panel se guardan en el servicio de la API, carpeta `uploads`.
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | Next.js y TypeScript |
-| Backend | Node.js, Express y TypeScript |
-| Base de datos | MongoDB |
-| Despliegue previsto | Cloudflare. Docker queda como alternativa |
+| Aplicación web | Next.js, TypeScript |
+| API | Node.js, Express, TypeScript |
+| Datos | MongoDB Atlas |
+| Contenedores | Docker |
 
-## Cómo ejecutarlo
+## API
 
-Hacen falta Node.js y Docker.
+La API escucha en el puerto 4000.
 
-En una terminal, levanta la base y la API:
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/health` | Estado del servicio |
+| GET | `/api/habitaciones` | Catálogo de habitaciones |
+| GET | `/api/habitaciones/:codigo` | Ficha de una habitación |
+| GET | `/api/amenidades` | Catálogo de amenidades |
+| POST | `/api/auth/registro` | Registro de huésped |
+| POST | `/api/auth/sesion` | Inicio de sesión |
+| POST | `/api/habitaciones` | Alta de habitación (administrador) |
+| PATCH | `/api/habitaciones/:codigo` | Edición, precio, descripción y estado |
+| POST | `/api/habitaciones/:codigo/fotos` | Alta de fotografía |
+| DELETE | `/api/habitaciones/:codigo/fotos` | Retiro de fotografía |
+
+`GET /api/habitaciones` acepta `tipo`, `huespedes`, `precioMin`, `precioMax` y `amenidades`. El catálogo público omite las habitaciones deshabilitadas. No existe borrado de habitaciones.
+
+## Operación local
 
 ```bash
 cd backend
-docker compose up -d
 npm install
 npm run dev
 ```
-
-La API queda en http://localhost:4000. Si la base está vacía, carga sola las 6 habitaciones y las 10 amenidades. Para volver a cargarlas:
-
-```bash
-npm run seed
-```
-
-En otra terminal, el catálogo:
 
 ```bash
 cd frontend
@@ -58,38 +65,7 @@ npm install
 npm run dev
 ```
 
-Abre http://localhost:3000. Un detalle de ejemplo es http://localhost:3000/habitacion/sencilla.
+- Catálogo: http://localhost:3000
+- API: http://localhost:4000
 
-`backend/.env` usa MongoDB local:
-
-```text
-MONGODB_URI=mongodb://127.0.0.1:27017/starhotel
-```
-
-Para MongoDB Atlas, sustituye esa variable por la cadena del cluster. El formato está en `backend/.env.example`.
-
-## API
-
-| Método | Ruta | Uso |
-|---|---|---|
-| GET | `/api/health` | Comprueba que la API responde |
-| GET | `/api/habitaciones` | Lista el catálogo |
-| GET | `/api/habitaciones/:codigo` | Devuelve una habitación |
-| GET | `/api/amenidades` | Lista las amenidades |
-
-El listado acepta `tipo`, `huespedes`, `precioMin`, `precioMax` y `amenidades`.
-
-Ejemplo: http://localhost:4000/api/habitaciones?tipo=Suite
-
-## Datos del catálogo
-
-| Código | Habitación | Tipo | Capacidad | Precio |
-|---|---|---|---|---:|
-| sencilla | Habitación Sencilla | Sencilla | 1 adulto, 1 niño | Q85 |
-| sencilla-deluxe | Habitación Sencilla Deluxe | Sencilla | 1 adulto, 1 niño | Q110 |
-| doble | Habitación Doble | Doble | 2 adultos, 2 niños | Q130 |
-| ejecutiva | Habitación Ejecutiva | Sencilla | 1 adulto | Q150 |
-| doble-vista-al-mar | Habitación Doble Vista al Mar | Doble | 2 adultos, 2 niños | Q195 |
-| suite-familiar | Suite Familiar | Suite | 4 adultos, 3 niños | Q260 |
-
-Cada habitación guarda nombre, tipo, capacidad, precio por noche en quetzales, amenidades, fotos y descripción.
+La conexión a MongoDB Atlas se define en `backend/.env` mediante `MONGODB_URI`. El archivo no se versiona.

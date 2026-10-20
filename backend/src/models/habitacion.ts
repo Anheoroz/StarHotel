@@ -17,8 +17,9 @@ const habitacionSchema = new Schema(
     moneda: { type: String, required: true, default: "GTQ" },
     amenidades: { type: [String], required: true },
     fotos: { type: [String], required: true },
-    descripcion: { type: String, required: true },
+    descripcion: { type: String, required: false, default: "Sin descripción." },
     orden: { type: Number, required: true },
+    activa: { type: Boolean, required: true, default: true },
   },
   { collection: "habitaciones", versionKey: false },
 );
@@ -37,6 +38,7 @@ export type HabitacionDocumento = {
   fotos: string[];
   descripcion: string;
   orden: number;
+  activa?: boolean;
 };
 
 export type HabitacionRespuesta = {
@@ -49,6 +51,7 @@ export type HabitacionRespuesta = {
   amenidades: string[];
   fotos: string[];
   descripcion: string;
+  activa: boolean;
 };
 
 export function toHabitacionRespuesta(doc: HabitacionDocumento): HabitacionRespuesta {
@@ -62,6 +65,7 @@ export function toHabitacionRespuesta(doc: HabitacionDocumento): HabitacionRespu
     amenidades: doc.amenidades,
     fotos: doc.fotos,
     descripcion: doc.descripcion,
+    activa: doc.activa !== false,
   };
 }
 

@@ -1,8 +1,11 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import path from "node:path";
 import { connectDb } from "./db";
 import { amenidadesRouter } from "./routes/amenidades";
+import { authRouter, usuariosRouter } from "./routes/auth";
+import { baseRouter } from "./routes/base";
 import { habitacionesRouter } from "./routes/habitaciones";
 import { seedIfEmpty } from "./seed";
 
@@ -11,10 +14,14 @@ const port = Number(process.env.PORT ?? 4000);
 
 app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:3000" }));
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, servicio: "star-hotel-api" });
 });
+app.use("/api/base", baseRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/usuarios", usuariosRouter);
 app.use("/api/amenidades", amenidadesRouter);
 app.use("/api/habitaciones", habitacionesRouter);
 

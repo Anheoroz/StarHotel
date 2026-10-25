@@ -4,9 +4,11 @@ Sistema de catálogo y reservas de habitaciones. Un visitante explora las habita
 
 El proyecto permite explorar el catálogo, consultar disponibilidad, reservar de una a cuatro habitaciones y completar un pago simulado, con los datos guardados en MongoDB. La referencia visual es el prototipo [star-hotel-catalog.lovable.app](https://star-hotel-catalog.lovable.app/).
 
-El **Sprint 3** tiene una base independiente **`starthotel_db` en MongoDB Atlas** para la demo. Consulta [docs/atlas.md](docs/atlas.md) para ejecutar el proyecto, elegir Atlas o local y compartir la configuración y las cuatro cuentas por privado. La base anterior `starhotel` se conserva.
+Durante el **Sprint 3** se preparó una base independiente **`starthotel_db` en MongoDB Atlas** para la demo. [docs/atlas.md](docs/atlas.md) documenta esa preparación y los perfiles privados. El equipo debe confirmar el destino actual antes de usarlo con esta entrega.
 
 El **Sprint 4** se desarrolla y comprueba en local. La configuración final de Atlas debe confirmarse con el responsable del equipo antes de integrar sus datos. [docs/despliegue.md](docs/despliegue.md) contiene las variables, los pasos de publicación y las comprobaciones pendientes de realizar en la nube.
+
+**Para recibir y continuar esta entrega, empezar por [docs/entrega-sprint4.md](docs/entrega-sprint4.md).** Incluye preparación local, cuentas, recorrido de demo, comprobación de la base y diferencias con la otra versión del equipo. La rama `sprint4` conserva nuestro Sprint 3; todavía no se ha unido con la versión posterior del compañero.
 
 ## Qué incluye ahora
 
@@ -43,17 +45,28 @@ docs/       Guía compartida de ejecución y conexión a Atlas.
 
 ## Cómo ejecutarlo
 
-Para la demo con Atlas, sigue [docs/atlas.md](docs/atlas.md): solo hace falta Node.js y los dos archivos privados del equipo.
+La demostración local requiere **Node.js 22 o superior y Docker con Docker Compose**. No necesita credenciales de Atlas. En una carpeta nueva del proyecto, ejecutar desde la raíz:
 
-Los pasos siguientes son para la modalidad local, que requiere Node.js 22 o superior y Docker.
+```bash
+node scripts/preparar-local.cjs
+```
+
+El comando instala las dependencias de ambas partes, selecciona la base local, inicia MongoDB y agrega los datos de demostración que falten. Conserva las cuentas y datos ya existentes. Al terminar, iniciar la API con `npm run dev` desde `backend/` y la web con `npm run dev` desde `frontend/`, en dos terminales. Abrir http://localhost:3000.
+
+Si la terminal o los archivos privados apuntan a otros servidores, la preparación pide usar una carpeta nueva para conservar esas configuraciones. Para usar Atlas, seguir primero la comprobación de compatibilidad de la [guía de entrega](docs/entrega-sprint4.md) y después la [guía de despliegue](docs/despliegue.md).
+
+<details>
+<summary>Preparación local paso a paso, como alternativa al comando anterior</summary>
+
+Los pasos siguientes permiten preparar cada parte manualmente.
 
 En una terminal, levanta la base y la API:
 
 ```bash
 cd backend
-cp .env.local.example .env.local
+npm ci
+npm run db:local
 docker compose -f docker-compose.local.yml up -d
-npm install
 npm run setup:local
 npm run dev
 ```
@@ -68,11 +81,13 @@ En otra terminal, el catálogo:
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
 Abre http://localhost:3000. Un detalle de ejemplo es http://localhost:3000/habitacion/sencilla.
+
+</details>
 
 Abre http://localhost:3000/reservar para consultar disponibilidad. Las cuentas locales son `admin@starhotel.test`, `recepcion@starhotel.test`, `mantenimiento@starhotel.test` y `cliente@starhotel.test`, con contraseña de demostración `DemoStar2026!`. Estas contraseñas **solo corresponden al entorno local**. En Atlas se utilizan los accesos privados del equipo.
 
@@ -120,6 +135,15 @@ Cada habitación guarda nombre, tipo, capacidad, precio por noche en quetzales, 
 
 ## Comprobar el Sprint 4
 
+Para comprobar **sin modificar datos** si la base seleccionada es compatible con esta versión:
+
+```bash
+cd backend
+npm run db:check
+```
+
+El resultado revisa catálogo, inventario físico, formatos de usuarios y reservas. No muestra la conexión ni las contraseñas. Una base incompatible requiere revisar la integración antes de usarla; cambiar solamente el `.env` no adapta ni copia sus datos.
+
 Con MongoDB local en marcha, ejecutar en `backend`:
 
 ```bash
@@ -128,7 +152,7 @@ npm test
 npm run build
 ```
 
-Las pruebas utilizan únicamente las bases locales desechables `starhotel_test`, `starhotel_test_amenidades` y `starhotel_test_reservas` en el puerto 27018. No prueban sobre Atlas ni borran los datos de la demo.
+Las pruebas utilizan únicamente las bases locales desechables `starhotel_test`, `starhotel_test_amenidades`, `starhotel_test_reservas` y `starhotel_test_entrega` en el puerto 27018. No prueban sobre Atlas ni borran los datos de la demo.
 
 En `frontend`:
 

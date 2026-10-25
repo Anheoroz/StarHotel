@@ -2,12 +2,15 @@
 
 El código se prepara para publicar la API y la web como **dos servicios Node.js del mismo repositorio**. La publicación sigue pendiente de la cuenta del compañero y de confirmar cuál es la base de Atlas del equipo. Esta guía y los archivos `railway.toml` no crean servicios ni generan cobros.
 
+La [guía de entrega](entrega-sprint4.md) reúne lo que está terminado, la instalación local y las diferencias que debe conservar quien integre la versión del compañero.
+
 ## 1. Confirmar antes de publicar
 
 - Usar la rama `sprint4` cuando el equipo la haya subido y revisado.
 - Confirmar con el responsable de Atlas la conexión y el nombre de la base que contiene el catálogo, las habitaciones físicas y los usuarios. Crear otro clúster o cambiar un `.env` **no traslada esos datos**.
 - Respaldar la base que se vaya a usar antes de integrar el sprint. No ejecutar `seed` ni `setup:local` en Atlas; están protegidos para uso local.
 - Conservar las contraseñas existentes al copiar usuarios. Las cuentas de la web son distintas del usuario que conecta con MongoDB.
+- Ejecutar `npm run db:check` desde backend con el perfil aprobado y `EXPECTED_DB_NAME` correcto. Esta comprobación solo lee la base. Si detecta usuarios de otra versión, inventario incompleto o reservas incompatibles, seguir el apartado de integración de la guía de entrega antes de publicar.
 
 ## 2. API en Railway
 

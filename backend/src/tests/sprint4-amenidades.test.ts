@@ -335,3 +335,108 @@ test("Las lecturas omiten asignaciones antiguas a amenidades eliminadas y guarda
   );
   assert.equal(await Habitacion.countDocuments({ amenidades: "piscina" }), 0);
 });
+
+test("Volver a crear un servicio eliminado permite asignarlo de nuevo sin recuperar relaciones antiguas", async () => {
+  // Una edición iniciada antes de eliminar puede conservar el código anterior.
+  await Habitacion.updateOne(
+    { codigo: "sencilla" },
+    { $addToSet: { amenidades: "piscina" } },
+  );
+  const service = {
+    codigo: "piscina",
+    nombre: "Piscina",
+    descripcion: "Piscina renovada para huéspedes del hotel.",
+  };
+  const created = await request(
+    "/amenidades",
+    "POST",
+    service,
+    sessions.administrador,
+  );
+  assert.equal(created.status, 201);
+  assert.equal(created.body.nombre, service.nombre);
+  assert.notEqual(created.body.codigo, "piscina");
+  assert.match(created.body.codigo, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+  assert.equal((await Amenidad.findOne({ codigo: "piscina" }))!.activa, false);
+  for (const codigo of [service.codigo, created.body.codigo])
+    assert.equal(
+      (
+        await request(
+          "/amenidades",
+          "POST",
+          { ...service, codigo },
+          sessions.administrador,
+        )
+      ).status,
+      409,
+    );
+
+  const room = await request("/habitaciones/sencilla");
+  assert.ok(!room.body.amenidades.includes("piscina"));
+  assert.ok(!room.body.amenidades.includes(created.body.codigo));
+  const catalog = (
+    await request("/admin/catalogo", "GET", undefined, sessions.administrador)
+  ).body.find((h: { codigo: string }) => h.codigo === "sencilla");
+  const assigned = await request(
+    "/admin/catalogo/sencilla",
+    "PATCH",
+    {
+      nombre: catalog.nombre,
+      tipo: catalog.tipo,
+      adultos: catalog.capacidad.adultos,
+      ninos: catalog.capacidad.ninos,
+      precio: catalog.precioPorNoche,
+      descripcion: catalog.descripcion,
+      fotos: catalog.fotos,
+      amenidades: ["wifi", created.body.codigo],
+    },
+    sessions.administrador,
+  );
+  assert.equal(assigned.status, 200);
+  assert.deepEqual((await request("/habitaciones/sencilla")).body.amenidades, [
+    "wifi",
+    created.body.codigo,
+  ]);
+
+  assert.equal(
+    (
+      await request(
+        `/amenidades/${created.body.codigo}`,
+        "DELETE",
+        {},
+        sessions.administrador,
+      )
+    ).status,
+    200,
+  );
+  const again = await request(
+    "/amenidades",
+    "POST",
+    service,
+    sessions.administrador,
+  );
+  assert.equal(again.status, 201);
+  assert.notEqual(again.body.codigo, service.codigo);
+  assert.notEqual(again.body.codigo, created.body.codigo);
+  assert.deepEqual((await request("/habitaciones/sencilla")).body.amenidades, [
+    "wifi",
+  ]);
+
+  await request(
+    `/amenidades/${again.body.codigo}`,
+    "DELETE",
+    {},
+    sessions.administrador,
+  );
+  const simultaneous = await Promise.all(
+    Array.from({ length: 5 }, () =>
+      request("/amenidades", "POST", service, sessions.administrador),
+    ),
+  );
+  assert.equal(simultaneous.filter((result) => result.status === 201).length, 1);
+  assert.equal(simultaneous.filter((result) => result.status === 409).length, 4);
+  assert.equal(
+    await Amenidad.countDocuments({ nombre: service.nombre, activa: true }),
+    1,
+  );
+});

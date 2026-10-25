@@ -661,7 +661,71 @@ function ReservaConfirmada({
   const [numero, setNumero] = useState("");
   const [vencimiento, setVencimiento] = useState("");
   const [cvv, setCvv] = useState("");
+  const [errorSincronizacion, setErrorSincronizacion] = useState("");
+  const sincronizacion = useRef(0);
+  const errorPago = useRef<HTMLParagraphElement>(null);
   const pagada = reserva.estado === "pagada";
+
+  useEffect(() => {
+    if (error)
+      errorPago.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+  }, [error]);
+
+  useEffect(() => {
+    if (reserva.estado !== "pendiente-pago" || pagando) return;
+    const version = ++sincronizacion.current;
+    let vigente = true;
+    let consultando = false;
+    let temporizador: ReturnType<typeof setTimeout>;
+
+    function programar() {
+      const restante = new Date(reserva.expira).getTime() - Date.now();
+      const espera = restante > 0 ? Math.min(restante + 100, 30_000) : 10_000;
+      temporizador = setTimeout(() => void actualizar(), espera);
+    }
+
+    async function actualizar() {
+      if (consultando || !vigente || document.visibilityState === "hidden")
+        return;
+      consultando = true;
+      clearTimeout(temporizador);
+      try {
+        const resultado = await api<Reserva>(
+          `/reservas/${encodeURIComponent(reserva.id)}`,
+        );
+        if (vigente && version === sincronizacion.current) {
+          setErrorSincronizacion("");
+          onChange(resultado);
+        }
+      } catch {
+        if (vigente && version === sincronizacion.current)
+          setErrorSincronizacion(
+            "No se pudo actualizar el estado de tu reserva. Recupera la conexión y vuelve a esta pestaña, o recarga la página.",
+          );
+      } finally {
+        consultando = false;
+        if (vigente && version === sincronizacion.current) programar();
+      }
+    }
+
+    function alVolver() {
+      if (document.visibilityState === "visible") void actualizar();
+    }
+
+    programar();
+    window.addEventListener("focus", alVolver);
+    document.addEventListener("visibilitychange", alVolver);
+    return () => {
+      vigente = false;
+      clearTimeout(temporizador);
+      window.removeEventListener("focus", alVolver);
+      document.removeEventListener("visibilitychange", alVolver);
+    };
+  }, [reserva.id, reserva.expira, reserva.estado, pagando, onChange]);
+
   return (
     <div className="mt-7">
       <Pasos actual={pagada ? 3 : 2} />
@@ -674,10 +738,14 @@ function ReservaConfirmada({
               className={`inline-flex h-11 w-11 items-center justify-center rounded-full text-xl font-bold ${pagada ? "bg-emerald-100 text-emerald-800" : "bg-brand/10 text-brand"}`}
               aria-hidden="true"
             >
-              ✓
+              {reserva.estado === "vencida" ? "⌛" : "✓"}
             </span>
             <p className="mt-4 text-xs font-bold tracking-widest text-brand">
-              {pagada ? "ESTANCIA CONFIRMADA" : "RESERVA CREADA"}
+              {pagada
+                ? "ESTANCIA CONFIRMADA"
+                : reserva.estado === "vencida"
+                  ? "PLAZO DE PAGO VENCIDO"
+                  : "RESERVA CREADA"}
             </p>
             <h2 className="mt-2 text-2xl font-bold">
               {pagada
@@ -761,6 +829,23 @@ function ReservaConfirmada({
           </div>
         </section>
         <aside className="min-w-0 rounded-xl border border-zinc-200 bg-white p-6 lg:sticky lg:top-24">
+          {error && (
+            <p
+              ref={errorPago}
+              role="alert"
+              className="mb-4 rounded-md bg-red-50 p-3 text-sm leading-6 text-red-800"
+            >
+              {error}
+            </p>
+          )}
+          {errorSincronizacion && reserva.estado === "pendiente-pago" && (
+            <p
+              role="status"
+              className="mb-4 rounded-md bg-amber-50 p-3 text-sm leading-6 text-amber-900"
+            >
+              {errorSincronizacion}
+            </p>
+          )}
           {reserva.estado === "pendiente-pago" ? (
             <>
               <h2 className="text-xl font-bold">Completa tu pago</h2>
@@ -792,7 +877,8 @@ function ReservaConfirmada({
                 </p>
               </div>
               <p className="mt-3 text-xs leading-5 text-zinc-500">
-                Paga antes del{" "}
+                Tienes 15 minutos desde la creación de la reserva. Paga antes
+                del{" "}
                 {new Intl.DateTimeFormat("es-GT", {
                   dateStyle: "short",
                   timeStyle: "short",
@@ -805,6 +891,7 @@ function ReservaConfirmada({
                 onSubmit={async (event) => {
                   event.preventDefault();
                   if (pagando) return;
+                  sincronizacion.current += 1;
                   setPagando(true);
                   setError("");
                   const datos = new FormData(event.currentTarget);
@@ -831,11 +918,11 @@ function ReservaConfirmada({
                     setError((err as Error).message);
                     setCvv("");
                     try {
-                      onChange(
-                        await api<Reserva>(
-                          `/reservas/${encodeURIComponent(reserva.id)}`,
-                        ),
+                      const resultado = await api<Reserva>(
+                        `/reservas/${encodeURIComponent(reserva.id)}`,
                       );
+                      if (resultado.estado === "pagada") setError("");
+                      onChange(resultado);
                     } catch {
                       /* El mensaje del pago permite reintentar. */
                     }
@@ -930,14 +1017,6 @@ function ReservaConfirmada({
                     />
                   </label>
                 </div>
-                {error && (
-                  <p
-                    role="alert"
-                    className="rounded-md bg-red-50 p-3 text-sm leading-6 text-red-800"
-                  >
-                    {error}
-                  </p>
-                )}
                 <button className="btn-primary w-full" disabled={pagando}>
                   {pagando
                     ? "Procesando pago…"

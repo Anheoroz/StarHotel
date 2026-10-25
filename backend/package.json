@@ -9,6 +9,7 @@
     "setup:local": "tsx src/setup-local.ts",
     "db:local": "node scripts/db-mode.cjs local",
     "db:atlas": "node scripts/db-mode.cjs atlas",
+    "db:check": "node scripts/check-db.cjs",
     "test": "tsx --test src/tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

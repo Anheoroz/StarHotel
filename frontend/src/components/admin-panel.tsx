@@ -58,6 +58,7 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [editing, setEditing] = useState(false);
@@ -81,6 +82,7 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
     setUnidades(u);
     setUsuarios(users);
     setAmenidades(amenities);
+    setLoaded(true);
   }, []);
   useEffect(() => {
     let active = true;
@@ -96,6 +98,7 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
           setUnidades(u);
           setUsuarios(users);
           setAmenidades(amenities);
+          setLoaded(true);
         }
       })
       .catch((err) => {
@@ -115,7 +118,13 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
     setBusy(true);
     try {
       await action();
-      await reload();
+      try {
+        await reload();
+      } catch {
+        setError(
+          "El cambio se guardó, pero no se pudo actualizar el listado. Recarga la página para verlo.",
+        );
+      }
       setMessage(success);
       return true;
     } catch (err) {
@@ -213,7 +222,27 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
         </p>
       )}
       {loading ? (
-        <p className="mt-8">Cargando administración…</p>
+        <p role="status" className="mt-8">
+          Cargando administración…
+        </p>
+      ) : !loaded ? (
+        <button
+          type="button"
+          className="btn-secondary mt-5"
+          onClick={async () => {
+            setLoading(true);
+            setError("");
+            try {
+              await reload();
+            } catch (err) {
+              setError((err as Error).message);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          Volver a cargar administración
+        </button>
       ) : (
         <>
           {tab === "amenidades" && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/client-api";
 import { amenityCode, type Amenity } from "@/lib/amenities";
 
@@ -17,6 +17,13 @@ export function AmenitiesPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const editor = useRef<HTMLInputElement>(null);
+  const confirmation = useRef<HTMLButtonElement>(null);
+  const feedback = useRef<HTMLDivElement>(null);
+
+  function focusEditor() {
+    requestAnimationFrame(() => editor.current?.focus());
+  }
 
   async function mutate(action: () => Promise<unknown>, success: string) {
     setError("");
@@ -24,8 +31,20 @@ export function AmenitiesPanel({
     setBusy(true);
     try {
       await action();
-      await onChange();
+      try {
+        await onChange();
+      } catch {
+        setError(
+          "El cambio se guardó, pero no se pudo actualizar el listado. Recarga la página para verlo.",
+        );
+      }
       setMessage(success);
+      requestAnimationFrame(() =>
+        feedback.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        }),
+      );
       return true;
     } catch (err) {
       setError((err as Error).message);
@@ -71,27 +90,30 @@ export function AmenitiesPanel({
             setPendingDelete(null);
             setError("");
             setMessage("");
+            focusEditor();
           }}
         >
           Agregar amenidad
         </button>
       </div>
-      {error && (
-        <p
-          role="alert"
-          className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800"
-        >
-          {error}
-        </p>
-      )}
-      {message && (
-        <p
-          role="status"
-          className="mt-4 rounded-md bg-green-50 p-3 text-sm text-green-800"
-        >
-          {message}
-        </p>
-      )}
+      <div ref={feedback} className="scroll-mt-24">
+        {error && (
+          <p
+            role="alert"
+            className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800"
+          >
+            {error}
+          </p>
+        )}
+        {message && (
+          <p
+            role="status"
+            className="mt-4 rounded-md bg-green-50 p-3 text-sm text-green-800"
+          >
+            {message}
+          </p>
+        )}
+      </div>
       {draft && (
         <form
           onSubmit={save}
@@ -103,8 +125,10 @@ export function AmenitiesPanel({
           <label className="field-label">
             Nombre
             <input
+              ref={editor}
               className="field"
               required
+              disabled={busy}
               maxLength={120}
               value={draft.nombre}
               onChange={(e) =>
@@ -128,6 +152,7 @@ export function AmenitiesPanel({
             <textarea
               className="field min-h-24"
               required
+              disabled={busy}
               maxLength={500}
               value={draft.descripcion}
               onChange={(e) =>
@@ -162,6 +187,7 @@ export function AmenitiesPanel({
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
+              ref={confirmation}
               disabled={busy}
               className="btn-primary"
               onClick={async () => {
@@ -209,6 +235,9 @@ export function AmenitiesPanel({
                   setDraft({ ...amenity });
                   setEditing(true);
                   setPendingDelete(null);
+                  setError("");
+                  setMessage("");
+                  focusEditor();
                 }}
               >
                 Editar
@@ -220,6 +249,9 @@ export function AmenitiesPanel({
                 onClick={() => {
                   setPendingDelete(amenity);
                   setDraft(null);
+                  setError("");
+                  setMessage("");
+                  requestAnimationFrame(() => confirmation.current?.focus());
                 }}
               >
                 Eliminar

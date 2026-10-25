@@ -5,7 +5,7 @@ dotenv.config({ path: [".env.local", ".env"], quiet: true });
 
 export function assertLocalDatabase(uri = process.env.MONGODB_URI ?? ""): void {
   if (
-    !/^mongodb:\/\/(127\.0\.0\.1|localhost):\d+\/starhotel_(sprint3|test(?:_reservas|_amenidades)?)(?:\?|$)/.test(
+    !/^mongodb:\/\/(127\.0\.0\.1|localhost):\d+\/starhotel_(sprint3|test(?:_reservas|_amenidades|_entrega)?)(?:\?|$)/.test(
       uri,
     )
   ) {

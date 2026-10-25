@@ -34,15 +34,28 @@ function datos(body: Record<string, unknown>) {
 amenidadesRouter.post(
   "/",
   endpoint(async (req, res) => {
-    const codigo = texto(req.body.codigo, "Código", 80);
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(codigo))
+    const solicitado = texto(req.body.codigo, "Código", 80);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(solicitado))
       throw new HttpError(
         400,
         "El código solo admite letras minúsculas, números y guiones.",
       );
+    const fields = datos(req.body);
+    let codigo = solicitado;
+    let anterior = await Amenidad.findOne({ codigo }).select("activa").lean();
+    while (anterior) {
+      if (anterior.activa !== false)
+        throw new HttpError(409, "Ya existe una amenidad activa con ese código.");
+      // Un código retirado no se reutiliza: una edición antigua podría conservar
+      // esa relación. El servicio nuevo comienza sin habitaciones asignadas.
+      // Derivarlo del registro retirado hace que dos solicitudes simultáneas o
+      // repetidas elijan el mismo código y el índice único rechace duplicados.
+      codigo = `${solicitado.slice(0, 55).replace(/-+$/, "")}-${anterior._id}`;
+      anterior = await Amenidad.findOne({ codigo }).select("activa").lean();
+    }
     const amenidad = await Amenidad.create({
       codigo,
-      ...datos(req.body),
+      ...fields,
       activa: true,
     });
     res

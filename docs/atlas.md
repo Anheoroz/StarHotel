@@ -1,5 +1,7 @@
 # Atlas — base independiente del Sprint 3
 
+Esta guía describe la preparación anterior de Atlas. Para la entrega actual se utiliza la rama **`sprint4`**; empezar por [la guía de entrega](entrega-sprint4.md). Si el equipo creó otro clúster o cambió la versión de usuarios, confirmar su compatibilidad mediante `npm run db:check` antes de iniciar la API. No se ha verificado aquí ese nuevo destino.
+
 La base de pruebas del sprint se llama **`starthotel_db`**, dentro del clúster existente del equipo. Es independiente de la base anterior `starhotel`: esta última se conserva y no se reemplaza.
 
 El frontend y el backend siguen ejecutándose en la computadora. Únicamente los datos se alojan en Atlas. Esto no es el despliegue web de SCRUM-32.
@@ -53,7 +55,7 @@ Las cuentas de la web y el usuario de conexión a MongoDB son accesos distintos.
 
 ## Para que otro compañero haga la demo con Atlas
 
-1. Descargar la rama **`sprint3`** del repositorio e instalar las dependencias con `npm install` dentro de `backend` y de `frontend`.
+1. Descargar la rama **`sprint4`** de esta entrega e instalar las dependencias con `npm ci` dentro de `backend` y de `frontend`. La preparación local automatizada se explica en la guía de entrega; no es necesaria para seleccionar un perfil Atlas ya preparado.
 2. Recibir por el canal privado del equipo **dos archivos**: `atlas.env`, con la conexión autorizada a **`starthotel_db`**, y `ACCESOS-ATLAS.txt`, con las cuatro cuentas web de administrador, recepción, mantenimiento y cliente. El acceso de red de Atlas también debe permitir la conexión de su computadora; si no la permite, el administrador del clúster debe revisar ese acceso.
 3. Desde `backend/`, crear la carpeta privada:
 
@@ -77,7 +79,7 @@ REQUIRE_LOCAL_DB=false
 EXPECTED_DB_NAME=starthotel_db
 ```
 
-4. Ejecutar `npm run db:atlas`, después `npm run dev` en backend y frontend.
+4. Ejecutar `npm run db:atlas` y `npm run db:check` desde backend. Continuar con `npm run dev` en backend y frontend solo si la comprobación indica una base compatible. El comprobador no modifica los datos ni sus índices; el arranque de la API prepara los índices de reservas.
 5. Abrir http://localhost:3000 e ingresar con cualquiera de las cuatro cuentas indicadas en el archivo privado `ACCESOS-ATLAS.txt`.
 
 No hace falta Docker para esta modalidad. Docker se utiliza para los datos locales y las pruebas automáticas locales. No ejecutar `setup:local` sobre el perfil de Atlas ni intentar recrear la base compartida desde otra computadora.

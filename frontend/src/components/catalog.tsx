@@ -45,6 +45,13 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
     };
   }, []);
 
+  function changeDraft(filters: RoomFilters) {
+    requestVersion.current += 1;
+    setBusy(false);
+    setError("");
+    setDraft(filters);
+  }
+
   async function applyFilters() {
     const version = ++requestVersion.current;
     setError("");
@@ -52,6 +59,14 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
       setError(
         "Selecciona la fecha de ingreso y la de salida para consultar disponibilidad.",
       );
+      return;
+    }
+    if (
+      draft.minPrice !== "" &&
+      draft.maxPrice !== "" &&
+      Number(draft.minPrice) > Number(draft.maxPrice)
+    ) {
+      setError("El precio máximo debe ser igual o mayor que el mínimo.");
       return;
     }
     setBusy(true);
@@ -93,7 +108,7 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
       >
         <RoomFiltersForm
           value={draft}
-          onChange={setDraft}
+          onChange={changeDraft}
           onApply={applyFilters}
           amenities={amenities}
           busy={busy}
@@ -129,7 +144,7 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
           </button>
           <RoomFiltersForm
             value={draft}
-            onChange={setDraft}
+            onChange={changeDraft}
             onApply={applyFilters}
             amenities={amenities}
             busy={busy}

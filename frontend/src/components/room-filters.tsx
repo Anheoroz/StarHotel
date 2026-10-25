@@ -7,6 +7,7 @@ import {
   type RoomType,
 } from "@/lib/rooms";
 import type { Amenity } from "@/lib/amenities";
+import { fechaGuatemala, limiteReservas, sumarDias } from "@/lib/reservas";
 
 type RoomFiltersFormProps = {
   value: RoomFilters;
@@ -29,6 +30,7 @@ export function RoomFiltersForm({
   amenities,
   busy = false,
 }: RoomFiltersFormProps) {
+  const hoy = fechaGuatemala();
   function toggleType(tipo: RoomType) {
     onChange({ ...value, types: toggleValue(value.types, tipo) });
   }
@@ -51,9 +53,18 @@ export function RoomFiltersForm({
           Fecha de inicio
           <input
             type="date"
+            min={hoy}
+            max={limiteReservas(hoy)}
             value={value.checkIn}
             onChange={(event) =>
-              onChange({ ...value, checkIn: event.target.value })
+              onChange({
+                ...value,
+                checkIn: event.target.value,
+                checkOut:
+                  value.checkOut && event.target.value >= value.checkOut
+                    ? ""
+                    : value.checkOut,
+              })
             }
             className="h-11 w-full rounded-md border border-zinc-200 bg-background px-3 py-2"
           />
@@ -62,6 +73,9 @@ export function RoomFiltersForm({
           Fecha de salida
           <input
             type="date"
+            min={
+              value.checkIn ? sumarDias(value.checkIn, 1) : sumarDias(hoy, 1)
+            }
             value={value.checkOut}
             onChange={(event) =>
               onChange({ ...value, checkOut: event.target.value })

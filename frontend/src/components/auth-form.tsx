@@ -39,11 +39,18 @@ export function AuthForm() {
                 body: JSON.stringify(Object.fromEntries(form)),
               },
             );
+            const continuar = new URLSearchParams(window.location.search).get(
+              "continuar",
+            );
+            const retornoSeguro =
+              continuar && /^\/reservar(?:\?|$)/.test(continuar)
+                ? continuar
+                : null;
             router.push(
               cuenta.rol === "administrador"
                 ? "/admin"
                 : cuenta.rol === "cliente"
-                  ? "/cuenta"
+                  ? (retornoSeguro ?? "/cuenta")
                   : "/operacion",
             );
             router.refresh();

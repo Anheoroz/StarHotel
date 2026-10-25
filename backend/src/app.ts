@@ -8,9 +8,11 @@ import { adminRouter, inventario } from "./routes/admin";
 import { authRouter } from "./routes/auth";
 import { amenidadesRouter } from "./routes/amenidades";
 import { habitacionesRouter } from "./routes/habitaciones";
+import { disponibilidadRouter, reservasRouter } from "./routes/reservas";
 
 export const app = express();
 app.disable("x-powered-by");
+if (process.env.TRUST_PROXY === "1") app.set("trust proxy", 1);
 const origin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
 app.use(cors({ origin, credentials: true }));
 app.use(express.json({ limit: "100kb" }));
@@ -47,6 +49,8 @@ app.get(
 );
 app.use("/api/amenidades", amenidadesRouter);
 app.use("/api/habitaciones", habitacionesRouter);
+app.use("/api/disponibilidad", disponibilidadRouter);
+app.use("/api/reservas", reservasRouter);
 app.use((_req, res) => res.status(404).json({ error: "Ruta no encontrada." }));
 app.use(
   (

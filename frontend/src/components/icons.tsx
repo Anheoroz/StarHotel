@@ -169,10 +169,8 @@ function amenityPaths(id: AmenityId) {
           <path d="M14 14h.01" />
         </>
       );
-    default: {
-      const unreachable: never = id;
-      return unreachable;
-    }
+    default:
+      return <path d="m5 12 4 4 10-10" />;
   }
 }
 

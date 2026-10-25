@@ -35,9 +35,12 @@ async function datosCatalogo(body: Record<string, unknown>) {
     body.amenidades.some((a) => typeof a !== "string")
   )
     throw new HttpError(400, "Selecciona amenidades válidas.");
-  const codes = await Amenidad.distinct("codigo");
+  const codes = await Amenidad.distinct("codigo", { activa: { $ne: false } });
   if (body.amenidades.some((a) => !codes.includes(a)))
-    throw new HttpError(400, "Una amenidad no existe en el catálogo.");
+    throw new HttpError(
+      400,
+      "Una amenidad no existe o fue eliminada del catálogo.",
+    );
   return {
     nombre,
     tipo: body.tipo,
@@ -52,10 +55,33 @@ async function datosCatalogo(body: Record<string, unknown>) {
   };
 }
 
+async function limpiarAmenidades(codigo: string) {
+  // Retira solo códigos eliminados. Una lista antigua de activos podría borrar
+  // una amenidad válida creada y asignada por otro administrador entre consultas.
+  const inactivas = await Amenidad.distinct("codigo", { activa: false });
+  if (inactivas.length)
+    await Habitacion.updateOne(
+      { codigo },
+      { $pull: { amenidades: { $in: inactivas } } },
+    );
+  return Habitacion.findOne({ codigo }).lean();
+}
+
 adminRouter.get(
   "/catalogo",
   endpoint(async (_req, res) => {
-    res.json(await Habitacion.find().sort({ orden: 1 }).lean());
+    const [habitaciones, activas] = await Promise.all([
+      Habitacion.find().sort({ orden: 1 }).lean(),
+      Amenidad.distinct("codigo", { activa: { $ne: false } }),
+    ]);
+    res.json(
+      habitaciones.map((habitacion) => ({
+        ...habitacion,
+        amenidades: habitacion.amenidades.filter((codigo) =>
+          activas.includes(codigo),
+        ),
+      })),
+    );
   }),
 );
 adminRouter.post(
@@ -69,17 +95,14 @@ adminRouter.post(
       );
     const datos = await datosCatalogo(req.body);
     const last = await Habitacion.findOne().sort({ orden: -1 });
-    res
-      .status(201)
-      .json(
-        await Habitacion.create({
-          ...datos,
-          codigo,
-          moneda: "GTQ",
-          orden: (last?.orden ?? 0) + 1,
-          activa: true,
-        }),
-      );
+    await Habitacion.create({
+      ...datos,
+      codigo,
+      moneda: "GTQ",
+      orden: (last?.orden ?? 0) + 1,
+      activa: true,
+    });
+    res.status(201).json(await limpiarAmenidades(codigo));
   }),
 );
 adminRouter.patch(
@@ -94,7 +117,7 @@ adminRouter.patch(
       room.activa = req.body.activa;
     else room.set(await datosCatalogo(req.body));
     await room.save();
-    res.json(room);
+    res.json(await limpiarAmenidades(room.codigo));
   }),
 );
 

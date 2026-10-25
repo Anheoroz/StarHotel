@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { api } from "@/lib/client-api";
+import type { Amenity } from "@/lib/amenities";
 import { SlidersIcon } from "@/components/icons";
 import { RoomCard } from "@/components/room-card";
 import { RoomFiltersForm } from "@/components/room-filters";
@@ -15,8 +17,73 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draft, setDraft] = useState<RoomFilters>(emptyFilters);
   const [applied, setApplied] = useState<RoomFilters>(emptyFilters);
+  const [amenities, setAmenities] = useState<Amenity[]>([]);
+  const [availableCatalogs, setAvailableCatalogs] = useState<string[] | null>(
+    null,
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
-  const visibleRooms = filterRooms(rooms, applied);
+  const requestVersion = useRef(0);
+  const visibleRooms = filterRooms(rooms, applied).filter(
+    (room) => !availableCatalogs || availableCatalogs.includes(room.id),
+  );
+  useEffect(() => {
+    let active = true;
+    api<Amenity[]>("/amenidades")
+      .then((result) => {
+        if (active) setAmenities(result);
+      })
+      .catch(() => {
+        if (active)
+          setError(
+            "No se pudieron cargar las amenidades. Vuelve a cargar la página.",
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function applyFilters() {
+    const version = ++requestVersion.current;
+    setError("");
+    if (Boolean(draft.checkIn) !== Boolean(draft.checkOut)) {
+      setError(
+        "Selecciona la fecha de ingreso y la de salida para consultar disponibilidad.",
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      let catalogos: string[] | null = null;
+      if (draft.checkIn && draft.checkOut) {
+        const query = new URLSearchParams({
+          ingreso: draft.checkIn,
+          salida: draft.checkOut,
+        });
+        const result = await api<{ habitaciones: { catalogo: string }[] }>(
+          `/disponibilidad?${query}`,
+        );
+        catalogos = [
+          ...new Set(result.habitaciones.map((room) => room.catalogo)),
+        ];
+      }
+      if (version !== requestVersion.current) return;
+      setAvailableCatalogs(catalogos);
+      setApplied({
+        ...draft,
+        amenities: draft.amenities.filter((codigo) =>
+          amenities.some((a) => a.codigo === codigo),
+        ),
+      });
+      dialog.current?.close();
+    } catch (err) {
+      if (version === requestVersion.current) setError((err as Error).message);
+    } finally {
+      if (version === requestVersion.current) setBusy(false);
+    }
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1600px]">
@@ -27,7 +94,9 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
         <RoomFiltersForm
           value={draft}
           onChange={setDraft}
-          onApply={() => setApplied(draft)}
+          onApply={applyFilters}
+          amenities={amenities}
+          busy={busy}
         />
       </aside>
       <section id="habitaciones" className="min-w-0 flex-1 px-4 py-8 sm:px-6">
@@ -61,12 +130,30 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
           <RoomFiltersForm
             value={draft}
             onChange={setDraft}
-            onApply={() => {
-              setApplied(draft);
-              dialog.current?.close();
-            }}
+            onApply={applyFilters}
+            amenities={amenities}
+            busy={busy}
           />
+          {error && (
+            <p role="alert" className="mt-4 text-sm text-red-700">
+              {error}
+            </p>
+          )}
         </dialog>
+        {error && (
+          <p
+            role="alert"
+            className="mt-5 rounded-md bg-red-50 p-3 text-sm text-red-800"
+          >
+            {error}
+          </p>
+        )}
+        {applied.checkIn && applied.checkOut && (
+          <p className="mt-4 text-sm text-zinc-500">
+            Disponibilidad del {applied.checkIn} al {applied.checkOut}. Se
+            confirma nuevamente al reservar.
+          </p>
+        )}
         {visibleRooms.length === 0 ? (
           <p className="mt-8 text-center text-zinc-500">
             No hay habitaciones que coincidan con los filtros.
@@ -74,7 +161,12 @@ export function Catalog({ rooms }: { rooms: Room[] }) {
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {visibleRooms.map((room) => (
-              <RoomCard key={room.id} room={room} />
+              <RoomCard
+                key={room.id}
+                room={room}
+                ingreso={applied.checkIn}
+                salida={applied.checkOut}
+              />
             ))}
           </div>
         )}

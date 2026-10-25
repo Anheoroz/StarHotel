@@ -1,18 +1,19 @@
 "use client";
 
 import {
-  AMENITY_LABELS,
-  FILTER_AMENITIES,
   ROOM_TYPES,
   type AmenityId,
   type RoomFilters,
   type RoomType,
 } from "@/lib/rooms";
+import type { Amenity } from "@/lib/amenities";
 
 type RoomFiltersFormProps = {
   value: RoomFilters;
   onChange: (filters: RoomFilters) => void;
   onApply: () => void;
+  amenities: Amenity[];
+  busy?: boolean;
 };
 
 function toggleValue<T extends string>(values: T[], value: T): T[] {
@@ -25,6 +26,8 @@ export function RoomFiltersForm({
   value,
   onChange,
   onApply,
+  amenities,
+  busy = false,
 }: RoomFiltersFormProps) {
   function toggleType(tipo: RoomType) {
     onChange({ ...value, types: toggleValue(value.types, tipo) });
@@ -129,14 +132,18 @@ export function RoomFiltersForm({
       <fieldset className="mt-4">
         <legend className="text-sm font-medium">Amenidades</legend>
         <div className="mt-3 grid gap-3 text-[15px]">
-          {FILTER_AMENITIES.map((amenity) => (
-            <label key={amenity} className="flex items-center gap-2">
+          {amenities.map((amenity) => (
+            <label
+              key={amenity.codigo}
+              title={amenity.descripcion}
+              className="flex items-center gap-2"
+            >
               <input
                 type="checkbox"
-                checked={value.amenities.includes(amenity)}
-                onChange={() => toggleAmenity(amenity)}
+                checked={value.amenities.includes(amenity.codigo)}
+                onChange={() => toggleAmenity(amenity.codigo)}
               />
-              {AMENITY_LABELS[amenity]}
+              {amenity.nombre}
             </label>
           ))}
         </div>
@@ -144,9 +151,10 @@ export function RoomFiltersForm({
 
       <button
         type="submit"
+        disabled={busy}
         className="mt-5 w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white"
       >
-        Aplicar filtros
+        {busy ? "Consultando…" : "Aplicar filtros"}
       </button>
     </form>
   );

@@ -2,13 +2,23 @@ import Link from "next/link";
 import { Gallery } from "@/components/gallery";
 import { AmenityIcon } from "@/components/icons";
 import {
-  AMENITY_LABELS,
   capacityLabel,
   formatPrice,
+  roomAmenity,
   type Room,
 } from "@/lib/rooms";
 
-export function RoomCard({ room }: { room: Room }) {
+export function RoomCard({
+  room,
+  ingreso,
+  salida,
+}: {
+  room: Room;
+  ingreso?: string;
+  salida?: string;
+}) {
+  const fechas =
+    ingreso && salida ? `?${new URLSearchParams({ ingreso, salida })}` : "";
   return (
     <article className="overflow-hidden rounded-md border border-zinc-200 bg-white shadow-sm">
       <Gallery photos={room.fotos} name={room.nombre} />
@@ -24,8 +34,8 @@ export function RoomCard({ room }: { room: Room }) {
           {room.amenidades.slice(0, 5).map((amenity) => (
             <li
               key={amenity}
-              title={AMENITY_LABELS[amenity]}
-              aria-label={AMENITY_LABELS[amenity]}
+              title={roomAmenity(room, amenity).nombre}
+              aria-label={roomAmenity(room, amenity).nombre}
               className="flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 text-zinc-500"
             >
               <AmenityIcon id={amenity} />
@@ -40,7 +50,7 @@ export function RoomCard({ room }: { room: Room }) {
             <span className="text-zinc-500"> / noche</span>
           </p>
           <Link
-            href={`/habitacion/${room.id}`}
+            href={`/habitacion/${room.id}${fechas}`}
             className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
           >
             Ver más

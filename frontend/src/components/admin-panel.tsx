@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/client-api";
-import {
-  AMENITY_LABELS,
-  AMENITY_IDS,
-  ROOM_TYPES,
-  type AmenityId,
-} from "@/lib/rooms";
+import { ROOM_TYPES, type AmenityId } from "@/lib/rooms";
+import { type Amenity } from "@/lib/amenities";
+import { AmenitiesPanel } from "@/components/amenities-panel";
 import { Gallery } from "@/components/gallery";
 import { ESTADO_LABELS, type Unidad } from "@/lib/inventory";
 
@@ -57,6 +54,7 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [unidades, setUnidades] = useState<Unidad[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [amenidades, setAmenidades] = useState<Amenity[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -73,14 +71,16 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
   } | null>(null);
   const [search, setSearch] = useState("");
   const reload = useCallback(async () => {
-    const [m, u, users] = await Promise.all([
+    const [m, u, users, amenities] = await Promise.all([
       api<Modelo[]>("/admin/catalogo"),
       api<Unidad[]>("/admin/inventario"),
       api<Usuario[]>("/admin/usuarios"),
+      api<Amenity[]>("/amenidades"),
     ]);
     setModelos(m);
     setUnidades(u);
     setUsuarios(users);
+    setAmenidades(amenities);
   }, []);
   useEffect(() => {
     let active = true;
@@ -88,12 +88,14 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
       api<Modelo[]>("/admin/catalogo"),
       api<Unidad[]>("/admin/inventario"),
       api<Usuario[]>("/admin/usuarios"),
+      api<Amenity[]>("/amenidades"),
     ])
-      .then(([m, u, users]) => {
+      .then(([m, u, users, amenities]) => {
         if (active) {
           setModelos(m);
           setUnidades(u);
           setUsuarios(users);
+          setAmenidades(amenities);
         }
       })
       .catch((err) => {
@@ -174,6 +176,7 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
         {[
           ["inventario", "Habitaciones físicas"],
           ["catalogo", "Catálogo y fotografías"],
+          ["amenidades", "Amenidades"],
           ["usuarios", "Usuarios y roles"],
         ].map(([key, label]) => (
           <button
@@ -213,6 +216,9 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
         <p className="mt-8">Cargando administración…</p>
       ) : (
         <>
+          {tab === "amenidades" && (
+            <AmenitiesPanel amenities={amenidades} onChange={reload} />
+          )}
           {tab === "inventario" && (
             <section className="mt-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -534,9 +540,10 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
                       Amenidades
                     </legend>
                     <div className="flex flex-wrap gap-4">
-                      {AMENITY_IDS.map((id) => (
+                      {amenidades.map(({ codigo: id, nombre, descripcion }) => (
                         <label
                           key={id}
+                          title={descripcion}
                           className="flex items-center gap-2 text-sm"
                         >
                           <input
@@ -551,10 +558,16 @@ export function AdminPanel({ cuentaId }: { cuentaId: string }) {
                               })
                             }
                           />
-                          {AMENITY_LABELS[id]}
+                          {nombre}
                         </label>
                       ))}
                     </div>
+                    {amenidades.length === 0 && (
+                      <p className="text-sm text-zinc-500">
+                        Agrega servicios en la sección Amenidades para
+                        asignarlos aquí.
+                      </p>
+                    )}
                   </fieldset>
                   <div className="sm:col-span-2">
                     <label className="field-label">

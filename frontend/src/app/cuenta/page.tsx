@@ -3,6 +3,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { BedIcon } from "@/components/icons";
 import { RoomCard } from "@/components/room-card";
+import { MyReservations } from "@/components/my-reservations";
 import { SiteHeader } from "@/components/site-header";
 import { fetchRooms } from "@/lib/api";
 import { getCuenta } from "@/lib/session";
@@ -44,11 +45,11 @@ export default async function CuentaPage() {
               mar.
             </p>
             <Link
-              href="/#habitaciones"
+              href="/reservar"
               className="mt-7 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-bold text-brand transition hover:bg-white/90"
             >
               <BedIcon />
-              Explorar habitaciones<span aria-hidden="true">→</span>
+              Reservar mi estancia<span aria-hidden="true">→</span>
             </Link>
           </div>
           <div className="relative min-h-48 md:min-h-full">
@@ -112,7 +113,7 @@ export default async function CuentaPage() {
               {[
                 ["01", "Explora", "Conoce las fotos y los espacios."],
                 ["02", "Compara", "Filtra por huéspedes, precio y servicios."],
-                ["03", "Elige", "Revisa el detalle de tu habitación favorita."],
+                ["03", "Reserva", "Elige tus fechas y confirma tu estancia."],
               ].map(([step, title, text]) => (
                 <li key={step}>
                   <span className="text-xs font-bold text-brand">{step}</span>
@@ -123,6 +124,8 @@ export default async function CuentaPage() {
             </ol>
           </section>
         </div>
+
+        <MyReservations />
 
         {rooms.length > 0 && (
           <section className="mt-9">

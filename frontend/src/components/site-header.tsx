@@ -27,6 +27,12 @@ export function SiteHeader({ title = "HOTEL 5 ESTRELLAS" }: SiteHeaderProps) {
             <span className="hidden sm:inline">Inicio</span>
           </Link>
           <Link
+            href="/reservar"
+            className="rounded-md px-2 py-2 text-sm font-semibold text-brand"
+          >
+            Reservar
+          </Link>
+          <Link
             href="/#habitaciones"
             aria-label="Habitaciones"
             className="flex items-center gap-1.5 px-2 py-2 font-medium text-zinc-500"

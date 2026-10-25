@@ -1,3 +1,5 @@
+import type { Amenity } from "@/lib/amenities";
+
 export const AMENITY_IDS = [
   "wifi",
   "aire",
@@ -11,7 +13,7 @@ export const AMENITY_IDS = [
   "minibar",
 ] as const;
 
-export type AmenityId = (typeof AMENITY_IDS)[number];
+export type AmenityId = string;
 
 export const ROOM_TYPES = ["Sencilla", "Doble", "Suite"] as const;
 
@@ -25,6 +27,7 @@ export type Room = {
   ninos: number;
   precio: number;
   amenidades: AmenityId[];
+  amenidadesDetalle?: Amenity[];
   fotos: string[];
   descripcion: string;
 };
@@ -49,6 +52,16 @@ export const FILTER_AMENITIES: AmenityId[] = [
   "tina",
   "ducha",
 ];
+
+export function roomAmenity(room: Room, codigo: string): Amenity {
+  return (
+    room.amenidadesDetalle?.find((amenity) => amenity.codigo === codigo) ?? {
+      codigo,
+      nombre: AMENITY_LABELS[codigo] ?? codigo,
+      descripcion: "",
+    }
+  );
+}
 
 export type RoomFilters = {
   checkIn: string;
@@ -92,15 +105,29 @@ export function filterRooms(source: Room[], filters: RoomFilters): Room[] {
     if (filters.types.length > 0 && !filters.types.includes(room.tipo)) {
       return false;
     }
-    if (Number.isFinite(guests) && guests > 0 && room.adultos + room.ninos < guests) {
+    if (
+      Number.isFinite(guests) &&
+      guests > 0 &&
+      room.adultos + room.ninos < guests
+    ) {
       return false;
     }
-    if (minPrice !== null && Number.isFinite(minPrice) && room.precio < minPrice) {
+    if (
+      minPrice !== null &&
+      Number.isFinite(minPrice) &&
+      room.precio < minPrice
+    ) {
       return false;
     }
-    if (maxPrice !== null && Number.isFinite(maxPrice) && room.precio > maxPrice) {
+    if (
+      maxPrice !== null &&
+      Number.isFinite(maxPrice) &&
+      room.precio > maxPrice
+    ) {
       return false;
     }
-    return filters.amenities.every((amenity) => room.amenidades.includes(amenity));
+    return filters.amenities.every((amenity) =>
+      room.amenidades.includes(amenity),
+    );
   });
 }

@@ -5,10 +5,12 @@ import { AmenityIcon } from "@/components/icons";
 import { ReservationBar } from "@/components/reservation-bar";
 import { SiteHeader } from "@/components/site-header";
 import { fetchRoom } from "@/lib/api";
-import { AMENITY_LABELS, capacityLabel, formatPrice } from "@/lib/rooms";
+import { capacityLabel, formatPrice, roomAmenity } from "@/lib/rooms";
+import { fechaParametro } from "@/lib/reservas";
 
 type HabitacionPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export const dynamic = "force-dynamic";
@@ -27,8 +29,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function HabitacionPage({ params }: HabitacionPageProps) {
-  const { id } = await params;
+export default async function HabitacionPage({
+  params,
+  searchParams,
+}: HabitacionPageProps) {
+  const [{ id }, fechas] = await Promise.all([params, searchParams]);
+  const ingreso = fechaParametro(fechas.ingreso);
+  const salida = fechaParametro(fechas.salida);
   let room;
   try {
     room = await fetchRoom(id);
@@ -79,14 +86,28 @@ export default async function HabitacionPage({ params }: HabitacionPageProps) {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 text-brand">
                     <AmenityIcon id={amenity} />
                   </span>
-                  {AMENITY_LABELS[amenity]}
+                  <span>
+                    <span className="font-medium">
+                      {roomAmenity(room, amenity).nombre}
+                    </span>
+                    {roomAmenity(room, amenity).descripcion && (
+                      <span className="mt-1 block text-sm text-zinc-500">
+                        {roomAmenity(room, amenity).descripcion}
+                      </span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
           </section>
         </div>
       </main>
-      <ReservationBar />
+      <ReservationBar
+        key={`${room.id}-${ingreso}-${salida}`}
+        catalogo={room.id}
+        ingresoInicial={ingreso}
+        salidaInicial={salida}
+      />
     </>
   );
 }

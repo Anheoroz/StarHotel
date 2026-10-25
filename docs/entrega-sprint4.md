@@ -1,8 +1,8 @@
 # Entrega del Sprint 4 — Grupo No. 1
 
-Esta rama entrega amenidades, disponibilidad, reservas y pago simulado funcionando en local. Incluye preparación para publicar y una guía para continuar sin depender de la computadora del autor. **La integración con la otra versión del equipo, la base definitiva de Atlas y la publicación quedan a cargo de quienes reciben la entrega.**
+Esta rama entrega amenidades, disponibilidad, reservas y pago simulado funcionando en local. Incorpora además una página de inicio adaptada al diseño actual. Incluye preparación para publicar y una guía para continuar sin depender de la computadora del autor. **La integración completa con la otra versión del equipo, la base definitiva de Atlas y la publicación quedan a cargo de quienes reciben la entrega.**
 
-La rama es **`sprint4`**, basada en nuestro Sprint 3 (`a18f6e0`); las funciones del Sprint 4 se guardaron inicialmente en `28cc939`. El remoto `sprint3` también contiene el avance `b4bde3b` del compañero. Este avance se conserva: todavía no se ha fusionado con esta rama. Subir `sprint4` a GitHub permite descargarla y revisarla, pero no publica la web ni cambia la base de datos.
+La rama es **`sprint4`**, basada en nuestro Sprint 3 (`a18f6e0`); las funciones del Sprint 4 se guardaron inicialmente en `28cc939`. Los remotos `sprint3` y `sprint-3-marvin` contienen el avance `b4bde3b` del compañero. Se tomó su estructura de inicio y sus imágenes como referencia para una adaptación visual puntual, conservando el burdeos y la tipografía Geist de esta versión. No se fusionaron su backend, sus cuentas ni su configuración de datos. Subir `sprint4` a GitHub permite descargarla y revisarla, pero no publica la web ni cambia la base de datos.
 
 ## Qué se entrega y qué falta
 
@@ -18,6 +18,10 @@ La rama es **`sprint4`**, basada en nuestro Sprint 3 (`a18f6e0`); las funciones 
 | SCRUM-38 · Pago | Simulación del importe completo, rechazo con reintento y confirmación persistida. | Repetir la simulación publicada; no se conecta a un banco. |
 
 Las cinco tareas funcionales están implementadas y comprobadas en local. La documentación está preparada; los estados y adjuntos de Jira no se actualizan automáticamente. El video lo realiza otro integrante como evidencia complementaria. No hace falta organizar una reunión para utilizar el registro escrito.
+
+Como complemento visual, `/` muestra el inicio con portada, buscador, información del hotel, experiencias, habitaciones destacadas, amenidades actuales y preguntas frecuentes. **Habitaciones** abre `/habitaciones`, donde se conserva el catálogo completo con sus filtros laterales y dos columnas en escritorio. El buscador lleva fechas y huéspedes a los filtros del catálogo; las fechas se conservan al continuar al detalle y la reserva. Este complemento no se presenta como una tarea adicional de Jira ni cambia el conteo de las 22 evidencias de las tareas.
+
+Se comprobaron siete recorridos del inicio y la navegación: datos reales del catálogo, imágenes, preguntas desplegables, búsqueda con fechas y huéspedes, continuidad hasta reservar, avisos de fechas inválidas y accesos por rol. Se revisaron anchos de 390 y 320 px, sin desbordamiento horizontal ni errores de JavaScript. La revisión de código y la compilación del frontend pasaron; el inicio, el catálogo y la búsqueda móvil se comprobaron también con la aplicación compilada.
 
 ## Descargar y ejecutar esta versión
 
@@ -54,7 +58,7 @@ cd frontend
 npm run dev
 ```
 
-Abrir **http://localhost:3000**. Comprobar **http://localhost:4000/api/health**: debe mostrar `ok: true`, `entorno: "local"` y `baseDeDatos: "starhotel_sprint3"`. El nombre conserva el del Sprint 3 para continuar sus datos; también admite las funciones nuevas.
+Abrir **http://localhost:3000** para ver el inicio; **Habitaciones** lleva a **http://localhost:3000/habitaciones**. Comprobar **http://localhost:4000/api/health**: debe mostrar `ok: true`, `entorno: "local"` y `baseDeDatos: "starhotel_sprint3"`. El nombre conserva el del Sprint 3 para continuar sus datos; también admite las funciones nuevas.
 
 `db:local` selecciona el perfil privado local si existe o el ejemplo local incluido en el repositorio. No modifica el `.env` original ni copia datos desde Atlas. Las variables exportadas en una terminal tienen prioridad sobre los archivos: si el estado no indica la base local esperada, revisar esa configuración antes de preparar datos. `setup:local` solo admite la base local y agrega los datos que falten; conserva los registros existentes.
 
@@ -132,7 +136,8 @@ En navegador se comprobó además volver a crear un servicio eliminado y el venc
 
 | Paso de la demo | Resultado esperado |
 |---|---|
-| Abrir `/api/health` en el backend y `/` en la web. | API conectada a la base local; catálogo visible. |
+| Abrir `/api/health` en el backend y `/` en la web. | API conectada a la base local; inicio con portada, buscador e información del hotel. |
+| En el inicio, buscar fechas y huéspedes o pulsar **Habitaciones**. | Se abre `/habitaciones` con el catálogo completo, filtros y dos columnas en escritorio. El buscador lleva fechas y huéspedes a los filtros; las fechas se conservan al continuar al detalle y la reserva. |
 | Ingresar como administrador en `/acceso` → **Amenidades**. | Crear un servicio con nombre y descripción, editarlo y verlo en la lista. |
 | **Catálogo y fotografías** → **Editar información** → asignar ese servicio y guardar. | Al volver a editar sigue seleccionado; aparece en el detalle y en los filtros públicos. |
 | Eliminar el servicio de prueba. | Desaparece de filtros y asignaciones sin borrar las habitaciones. |
@@ -190,7 +195,7 @@ En el navegador, el cliente de esta rama llama a **`/api/backend/...`** en el do
 
 ## Compatibilidad con el avance del compañero
 
-La comparación corresponde a **`origin/sprint3` en `b4bde3b`**, no a una promesa sobre cambios remotos posteriores. Los dos avances comparten `a18f6e0`, pero luego modifican las mismas áreas. Una selección automática de todos los archivos de un lado perdería funciones del otro.
+La comparación corresponde a **`origin/sprint3` y `origin/sprint-3-marvin` en `b4bde3b`**, no a una promesa sobre cambios remotos posteriores. Los dos avances comparten `a18f6e0`, pero luego modifican las mismas áreas. Ya se incorporó una adaptación visual del inicio y sus imágenes; la unión del resto del código sigue pendiente. Una selección automática de todos los archivos de un lado perdería funciones del otro.
 
 | Área | Esta rama `sprint4` | Avance remoto `b4bde3b` | Tratamiento al integrar |
 |---|---|---|---|
@@ -201,7 +206,7 @@ La comparación corresponde a **`origin/sprint3` en `b4bde3b`**, no a una promes
 | Administración | `/admin`, `/operacion`, `/cuenta`; API `/admin/catalogo`, `/admin/inventario`, `/admin/usuarios`. | `/panel`; escritura en `/api/habitaciones` y creación de personal en `/api/usuarios`. | Preservar las capacidades útiles y aplicar una sola comprobación de permisos coherente. |
 | Habitaciones | Modelos en `habitaciones`, cuartos en `unidades` y reservas por ObjectId de unidad. | Modelo `habitaciones`; no incluye el modelo `Unidad` de esta rama. | Mantener la separación de catálogo e inventario antes de habilitar disponibilidad y reservas. |
 | Fotos | Enlaces o rutas de imágenes en el editor de catálogo. | Carga de archivos mediante `/api/habitaciones/:codigo/fotos`, servidos desde `/uploads`, además de URL. | Conservar la carga del compañero si se incorpora; adaptar permisos y prever almacenamiento persistente en el despliegue. |
-| Portada y diseño | Catálogo y vistas del Sprint 3 con las nuevas funciones de reserva. | Nueva portada, marca, imágenes, pie y componentes `home-story`, `site-footer`, `hotel-mark`, `reveal`. | Conservar ese trabajo visual y conectarlo con las nuevas rutas y amenidades dinámicas. No reemplazarlo al copiar el catálogo de esta rama. |
+| Portada y diseño | Inicio en `/`, adaptado a partir de la estructura e imágenes de Marvin con el burdeos y Geist actuales; catálogo completo en `/habitaciones`, con datos y amenidades de esta API. | Nueva portada, marca, imágenes, pie y componentes `home-story`, `site-footer`, `hotel-mark`, `reveal`. | La adaptación visual ya está incorporada. Conservarla al unir las demás funciones; no copiar de nuevo la portada completa ni reemplazar el catálogo y su flujo de reservas. |
 | Conexión y comprobación | `.env.local` antes de `.env`, perfiles, guardas y `/health` con base real. | Otro arranque y configuración; `/health` informa servicio sin nombre de base. | Revisar arranque y variables juntos; comprobar el destino real antes de escribir datos. |
 
 Archivos que conviene revisar juntos:
@@ -211,10 +216,11 @@ Archivos que conviene revisar juntos:
 | Cuenta y permisos | `backend/src/auth.ts`, `models/usuario.ts`, `routes/auth.ts`; `frontend/src/lib/session.ts`, `components/auth-form.tsx`, `account-nav.tsx`. En remoto, revisar también `frontend/src/lib/sesion.ts` y `cuenta-form.tsx`. |
 | Disponibilidad y reservas | `backend/src/models/unidad.ts`, `models/reserva.ts`, `reservas.ts`, `routes/reservas.ts`; `frontend/src/components/booking-flow.tsx`, `my-reservations.tsx`, `src/lib/reservas.ts`, `app/reservar/page.tsx`, `app/cuenta/page.tsx`. |
 | Amenidades y catálogo | `backend/src/models/amenidad.ts`, `routes/amenidades.ts`, `routes/admin.ts`, `routes/habitaciones.ts`; `frontend/src/components/amenities-panel.tsx`, `admin-panel.tsx`, `catalog.tsx`, `room-filters.tsx`, `src/lib/amenities.ts`. |
+| Inicio y navegación | `frontend/src/app/page.tsx`, `app/habitaciones/page.tsx`, `components/home-content.tsx`, `home-search.tsx`, `site-header.tsx`, `site-footer.tsx` e imágenes de `frontend/public/brand/`. |
 | Arranque y publicación | `backend/src/app.ts`, `src/index.ts`, `src/env.ts`, `src/db.ts`, `tsconfig.build.json`, ambos `railway.toml`, `frontend/next.config.ts`, ejemplos de variables y [guía de despliegue](despliegue.md). |
 | Comprobaciones | `backend/src/tests/sprint3.test.ts`, `sprint4-amenidades.test.ts`, `sprint4-reservas.test.ts`; pasos de demo de esta guía. |
 
-Secuencia de integración: conservar ambas ramas; unir en una rama aparte; resolver primero usuarios, sesiones e inventario; incorporar amenidades y reservas junto con sus pantallas; conservar la portada y las capacidades del compañero; ejecutar las pruebas y la demo completa. No hace falta modificar `main` para probar esa integración.
+Secuencia de integración: conservar ambas ramas; unir en una rama aparte; resolver primero usuarios, sesiones e inventario; incorporar amenidades y reservas junto con sus pantallas; conservar el inicio ya adaptado y revisar las otras capacidades del compañero; ejecutar las pruebas y la demo completa. No hace falta modificar `main` para probar esa integración.
 
 ## Atlas, publicación y material de presentación
 
@@ -229,7 +235,9 @@ Para dar por comprobada la parte de infraestructura, quien publique debe conserv
 3. Resultado de la demo completa desde otra computadora, con sesión, amenidades, reserva y pago simulado.
 4. Capturas remotas y enlaces adjuntos a SCRUM-17 y SCRUM-32, distinguiéndolos de las pruebas locales.
 
-El autor comparte **por separado** `Informe_Sprint_4_StarHotel.docx`, su PDF y la carpeta `docs/evidencias/sprint-4/`, con las 20 imágenes organizadas por Jira. El informe identifica al **Grupo No. 1** y contiene el registro escrito de SCRUM-33; el video se agrega cuando esté disponible. Esos materiales personales, los respaldos, `.env`, `.local` y las credenciales permanecen excluidos de GitHub.
+El autor comparte **por separado** `Informe_Sprint_4_StarHotel.docx`, su PDF y la carpeta `docs/evidencias/sprint-4/`, con las 22 imágenes organizadas por Jira. El informe identifica al **Grupo No. 1** y contiene el registro escrito de SCRUM-33; el video se agrega cuando esté disponible. Esos materiales personales, los respaldos, `.env`, `.local` y las credenciales permanecen excluidos de GitHub.
+
+El informe incluye además un anexo del nuevo inicio con tres imágenes. La carpeta personal `INICIO-complemento/` conserva esas capturas, una vista completa y su verificación, separadas de las 22 evidencias por tarea.
 
 No forman parte de esta entrega las temporadas y tarifas especiales, reservas de invitados, correo de confirmación, cancelaciones, reembolsos, check-in, check-out ni comentarios operativos. El resto del backlog puede continuar después sobre la versión integrada.
 

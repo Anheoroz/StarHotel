@@ -13,16 +13,30 @@ import {
   type RoomFilters,
 } from "@/lib/rooms";
 
-export function Catalog({ rooms }: { rooms: Room[] }) {
+export function Catalog({
+  rooms,
+  initialFilters = emptyFilters,
+  initialAvailableCatalogs = null,
+  initialError = "",
+}: {
+  rooms: Room[];
+  initialFilters?: RoomFilters;
+  initialAvailableCatalogs?: string[] | null;
+  initialError?: string;
+}) {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [draft, setDraft] = useState<RoomFilters>(emptyFilters);
-  const [applied, setApplied] = useState<RoomFilters>(emptyFilters);
+  const [draft, setDraft] = useState<RoomFilters>(initialFilters);
+  const [applied, setApplied] = useState<RoomFilters>(
+    initialError
+      ? { ...initialFilters, checkIn: "", checkOut: "" }
+      : initialFilters,
+  );
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [availableCatalogs, setAvailableCatalogs] = useState<string[] | null>(
-    null,
+    initialAvailableCatalogs,
   );
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError);
   const dialog = useRef<HTMLDialogElement>(null);
   const requestVersion = useRef(0);
   const visibleRooms = filterRooms(rooms, applied).filter(

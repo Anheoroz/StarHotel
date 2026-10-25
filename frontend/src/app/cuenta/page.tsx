@@ -139,7 +139,7 @@ export default async function CuentaPage() {
                 </h2>
               </div>
               <Link
-                href="/#habitaciones"
+                href="/habitaciones"
                 className="text-sm font-semibold text-brand underline underline-offset-4"
               >
                 Ver todas las habitaciones →

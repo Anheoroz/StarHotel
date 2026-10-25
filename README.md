@@ -1,6 +1,6 @@
 # Star Hotel
 
-Sistema de catálogo y reservas de habitaciones. Un visitante explora las habitaciones del hotel, las filtra y abre el detalle de cada una antes de reservar.
+Sistema de catálogo y reservas de habitaciones. La página de inicio presenta el hotel y permite buscar una estancia; en Habitaciones se explora el catálogo, se aplican filtros y se abre el detalle antes de reservar.
 
 El proyecto permite explorar el catálogo, consultar disponibilidad, reservar de una a cuatro habitaciones y completar un pago simulado, con los datos guardados en MongoDB. La referencia visual es el prototipo [star-hotel-catalog.lovable.app](https://star-hotel-catalog.lovable.app/).
 
@@ -8,11 +8,13 @@ Durante el **Sprint 3** se preparó una base independiente **`starthotel_db` en 
 
 El **Sprint 4** se desarrolla y comprueba en local. La configuración final de Atlas debe confirmarse con el responsable del equipo antes de integrar sus datos. [docs/despliegue.md](docs/despliegue.md) contiene las variables, los pasos de publicación y las comprobaciones pendientes de realizar en la nube.
 
-**Para recibir y continuar esta entrega, empezar por [docs/entrega-sprint4.md](docs/entrega-sprint4.md).** Incluye preparación local, cuentas, recorrido de demo, comprobación de la base y diferencias con la otra versión del equipo. La rama `sprint4` conserva nuestro Sprint 3; todavía no se ha unido con la versión posterior del compañero.
+**Para recibir y continuar esta entrega, empezar por [docs/entrega-sprint4.md](docs/entrega-sprint4.md).** Incluye preparación local, cuentas, recorrido de demo, comprobación de la base y diferencias con la otra versión del equipo. La rama `sprint4` conserva nuestro Sprint 3 e incorpora el inicio inspirado en `sprint-3-marvin`, con el estilo actual. La unión completa de ambas versiones sigue pendiente.
 
 ## Qué incluye ahora
 
-- Encabezado con accesos a Inicio y Habitaciones.
+- Inicio con portada, buscador de fechas y huéspedes, información del hotel, experiencias y preguntas frecuentes.
+- Habitaciones destacadas y amenidades tomadas del catálogo, con los colores burdeos y la tipografía actuales.
+- Encabezado con accesos a Inicio (`/`) y al catálogo completo en Habitaciones (`/habitaciones`), con filtros laterales y dos columnas en escritorio.
 - Seis tipos de habitación, de Q85 a Q260 por noche, con foto, capacidad y amenidades.
 - Filtros por fecha, huéspedes, tipo, precio y amenidades.
 - Detalle con galería, descripción, servicios y selección de fechas.
@@ -29,7 +31,7 @@ El pago no cobra dinero ni acepta tarjetas reales. Temporadas, correo de confirm
 ## Estructura
 
 ```text
-frontend/   Next.js. Catálogo que consume la API.
+frontend/   Next.js. Inicio, catálogo y reservas que consumen la API.
 backend/    API en Node.js y modelos de MongoDB.
 docs/       Guía compartida de ejecución y conexión a Atlas.
 ```
@@ -77,7 +79,7 @@ La API queda en http://localhost:4000. El entorno local usa el puerto MongoDB 27
 npm run setup:local
 ```
 
-En otra terminal, el catálogo:
+En otra terminal, la web:
 
 ```bash
 cd frontend
@@ -85,7 +87,7 @@ npm ci
 npm run dev
 ```
 
-Abre http://localhost:3000. Un detalle de ejemplo es http://localhost:3000/habitacion/sencilla.
+Abre http://localhost:3000 para ver el inicio y http://localhost:3000/habitaciones para el catálogo completo. El buscador lleva fechas y huéspedes a los filtros del catálogo; las fechas se conservan al continuar al detalle y la reserva. Un detalle de ejemplo es http://localhost:3000/habitacion/sencilla.
 
 </details>
 

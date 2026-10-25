@@ -1,31 +1,33 @@
-import { Catalog } from "@/components/catalog";
+import type { Metadata } from "next";
+import { HomeContent } from "@/components/home-content";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { fetchRooms } from "@/lib/api";
+import { roomAmenity } from "@/lib/rooms";
+
+export const metadata: Metadata = {
+  title: "Inicio",
+  description:
+    "Conoce Star Hotel en Ciudad de Guatemala. Descubre sus espacios, encuentra tu habitación y consulta disponibilidad para tu estancia.",
+};
 
 export default async function HomePage() {
-  let rooms;
-  try {
-    rooms = await fetchRooms();
-  } catch {
-    return (
-      <>
-        <SiteHeader />
-        <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-          <h1 className="text-2xl font-semibold">No se pudo cargar el catálogo</h1>
-          <p className="mt-3 text-zinc-500">
-            La API tiene que estar en marcha en el puerto 4000.
-          </p>
-        </main>
-      </>
-    );
-  }
+  const rooms = await fetchRooms().catch(() => []);
+  const amenities = [
+    ...new Map(
+      rooms.flatMap((room) =>
+        room.amenidades.map((id) => [id, roomAmenity(room, id)] as const),
+      ),
+    ).values(),
+  ];
 
   return (
     <>
       <SiteHeader />
       <main>
-        <Catalog rooms={rooms} />
+        <HomeContent rooms={rooms} amenities={amenities} />
       </main>
+      <SiteFooter />
     </>
   );
 }

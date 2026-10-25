@@ -117,7 +117,7 @@ export function AuthForm() {
       >
         {registro ? "Ya tengo cuenta" : "Crear una cuenta"}
       </button>
-      <Link href="/" className="mt-4 block text-sm text-zinc-500">
+      <Link href="/habitaciones" className="mt-4 block text-sm text-zinc-500">
         Volver al catálogo
       </Link>
     </section>

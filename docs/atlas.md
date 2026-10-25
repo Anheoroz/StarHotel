@@ -1,12 +1,36 @@
-# Atlas — base independiente del Sprint 3
+# Atlas — clúster original del equipo
 
-Esta guía describe la preparación anterior de Atlas. Para la entrega actual se utiliza la rama **`sprint4`**; empezar por [la guía de entrega](entrega-sprint4.md). Si el equipo creó otro clúster o cambió la versión de usuarios, confirmar su compatibilidad mediante `npm run db:check` antes de iniciar la API. No se ha verificado aquí ese nuevo destino.
+El equipo utilizará **el clúster original de Atlas**, con las credenciales privadas que ya se compartieron. El clúster alternativo creado para mostrar otra base no se utilizará en esta entrega. La rama **`sprint4`** ya está publicada; empezar por [la guía de entrega](entrega-sprint4.md).
 
-La base de pruebas del sprint se llama **`starthotel_db`**, dentro del clúster existente del equipo. Es independiente de la base anterior `starhotel`: esta última se conserva y no se reemplaza.
+Dentro del clúster original hay dos bases distintas: **`starthotel_db`**, preparada para esta versión durante el Sprint 3, y **`starhotel`**, utilizada por la versión anterior. Elegir el clúster original no significa cambiar al nombre antiguo `starhotel`: su inventario y sus cuentas requieren otra integración. El perfil privado `atlas.env` ya selecciona `starthotel_db`.
 
 El frontend y el backend siguen ejecutándose en la computadora. Únicamente los datos se alojan en Atlas. Esto no es el despliegue web de SCRUM-32.
 
-## Qué se preparó
+## Estado comprobado para el Sprint 4
+
+El **25/10/2026** se comprobó la estructura de ambas bases con `db:check`, en modo de solo lectura. Se verificó también que las dos conexiones guardadas corresponden al mismo servidor de Atlas:
+
+| Base | Resultado de la revisión |
+|---|---|
+| `starthotel_db` | Estructura compatible con el Sprint 4: catálogo, amenidades, habitaciones físicas y cuentas válidas, incluido un administrador. |
+| `starhotel` | Conserva cuentas con otro formato y no tiene el inventario físico que utiliza esta versión. No seleccionarla automáticamente para ejecutar el Sprint 4. |
+
+La colección de reservas y su índice todavía no existían en `starthotel_db` al revisarla. El comprobador lo informa como aviso: se preparan al arrancar la API. **Esta comprobación no arrancó la API contra Atlas ni creó colecciones o índices.** Tampoco trasladó datos, cambió contraseñas o seleccionó otro perfil; la aplicación de esta computadora sigue usando la base local.
+
+Queda ejecutar y probar el Sprint 4 con el perfil de Atlas, además de mostrar el panel del clúster original como solicitó el ingeniero. El diagnóstico detallado se conserva en `backend/.local/atlas/revision-sprint4-original.json`, excluido de GitHub. Las cantidades actuales pueden diferir de los datos iniciales porque el equipo puede agregar habitaciones o cuentas; la revisión no los restablece.
+
+## Evidencia solicitada para SCRUM-17
+
+El pendiente señalado por el ingeniero era **mostrar la base real del proyecto en Atlas**. Crear o mostrar otro clúster no acredita esa base.
+
+1. El propietario del proyecto de Atlas, o una persona a la que haya dado acceso, entra al proyecto original. Para mostrar datos desde el navegador se necesita al menos el rol `Project Data Access Read Only`; tener la conexión privada de la aplicación es un acceso distinto. Ver [permisos para consultar bases](https://www.mongodb.com/docs/atlas/atlas-ui/databases/) y [cómo compartir el proyecto](https://www.mongodb.com/docs/atlas/access/manage-project-access/).
+2. Abrir **Data Explorer**, seleccionar el clúster original y mostrar `starthotel_db` con sus colecciones. La guía oficial explica [cómo consultar las colecciones](https://www.mongodb.com/docs/atlas/atlas-ui/collections/). No es necesario mostrar contraseñas ni cadenas de conexión.
+3. Para relacionar la aplicación con esa base, seguir el procedimiento de ejecución con Atlas que aparece abajo y comprobar `/api/health`: debe mostrar `entorno: "atlas"` y `baseDeDatos: "starthotel_db"`. Probar también las cuentas, la disponibilidad y una reserva con pago simulado. Esas pruebas guardan sus datos en Atlas.
+4. Adjuntar en Jira las capturas del panel original y la comprobación de la conexión. Las capturas de la base local y las del clúster alternativo no sustituyen esa evidencia.
+
+Las capturas y el informe se comparten por separado; no se publican en GitHub. La tarea no se presenta como cerrada hasta reunir la evidencia correspondiente.
+
+## Qué se preparó durante el Sprint 3
 
 - Copia del catálogo, amenidades, habitaciones físicas y usuarios del entorno local que ya se probó.
 - Sesiones nuevas: no se trasladan sesiones de la computadora a Atlas.
@@ -26,7 +50,7 @@ Desde `backend/`:
 npm run db:atlas
 ```
 
-Selecciona el perfil privado de Atlas para `starthotel_db`. Para volver a los datos locales:
+Selecciona el perfil privado de Atlas para `starthotel_db` en el clúster original. Antes de iniciar la API, ejecutar `npm run db:check`. Para volver a los datos locales:
 
 ```bash
 npm run db:local

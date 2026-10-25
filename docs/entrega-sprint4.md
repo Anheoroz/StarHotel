@@ -1,14 +1,14 @@
 # Entrega del Sprint 4 — Grupo No. 1
 
-Esta rama entrega amenidades, disponibilidad, reservas y pago simulado funcionando en local. Incorpora además una página de inicio adaptada al diseño actual. Incluye preparación para publicar y una guía para continuar sin depender de la computadora del autor. **La integración completa con la otra versión del equipo, la base definitiva de Atlas y la publicación quedan a cargo de quienes reciben la entrega.**
+Esta rama entrega amenidades, disponibilidad, reservas y pago simulado funcionando en local. Incorpora además una página de inicio adaptada al diseño actual. Incluye preparación para publicar y una guía para continuar sin depender de la computadora del autor. **Se utilizará `starthotel_db` del clúster original de Atlas; su estructura se comprobó mediante una consulta de solo lectura, con resultado compatible. Falta iniciar y probar esta versión con Atlas, adjuntar las evidencias de su panel y publicar el proyecto.** La integración completa con la otra versión del equipo se explica por separado.
 
-La rama es **`sprint4`**, basada en nuestro Sprint 3 (`a18f6e0`); las funciones del Sprint 4 se guardaron inicialmente en `28cc939`. Los remotos `sprint3` y `sprint-3-marvin` contienen el avance `b4bde3b` del compañero. Se tomó su estructura de inicio y sus imágenes como referencia para una adaptación visual puntual, conservando el burdeos y la tipografía Geist de esta versión. No se fusionaron su backend, sus cuentas ni su configuración de datos. Subir `sprint4` a GitHub permite descargarla y revisarla, pero no publica la web ni cambia la base de datos.
+La rama es **`sprint4`**, publicada en GitHub y basada en nuestro Sprint 3 (`a18f6e0`); las funciones del Sprint 4 se guardaron inicialmente en `28cc939`. Los remotos `sprint3` y `sprint-3-marvin` contienen el avance `b4bde3b` del compañero. Se tomó su estructura de inicio y sus imágenes como referencia para una adaptación visual puntual, conservando el burdeos y la tipografía Geist de esta versión. No se fusionaron su backend, sus cuentas ni su configuración de datos. La rama publicada permite descargarla y revisarla, pero no publica la web ni cambia la base de datos.
 
 ## Qué se entrega y qué falta
 
 | Jira | Entrega | Trabajo que continúa el equipo |
 |---|---|---|
-| SCRUM-17 · Atlas | Se conserva la preparación anterior para `starthotel_db`; este sprint se probó con MongoDB local. | Identificar el clúster y la base definitivos, revisar compatibilidad, respaldar y comprobar la conexión real. |
+| SCRUM-17 · Atlas | `starthotel_db` del clúster original, preparada en el Sprint 3; comprobación de estructura con `db:check` compatible y de solo lectura. | Iniciar y probar esta versión con Atlas; adjuntar en Jira capturas de la base en el panel del clúster original, como pidió el ingeniero. |
 | SCRUM-30 · Amenidades | Crear, editar y eliminar desde administración, con nombre y descripción. | Repetir la comprobación en la versión integrada y publicada. |
 | SCRUM-31 · Asignación | Seleccionar amenidades de cada modelo y reflejarlas en detalle y filtros. | Repetir la comprobación después de integrar. |
 | SCRUM-32 · Despliegue | Compilación e inicio de ambos servicios, archivos Railway, ejemplos de variables y [guía de despliegue](despliegue.md). | Publicar, guardar ambas URL y verificar desde otra computadora. |
@@ -17,7 +17,7 @@ La rama es **`sprint4`**, basada en nuestro Sprint 3 (`a18f6e0`); las funciones 
 | SCRUM-36 · Reservas | Cliente identificado, contacto, fechas y de una a cuatro habitaciones; identificador e historial propio. | Repetir la comprobación después de integrar y publicar. |
 | SCRUM-38 · Pago | Simulación del importe completo, rechazo con reintento y confirmación persistida. | Repetir la simulación publicada; no se conecta a un banco. |
 
-Las cinco tareas funcionales están implementadas y comprobadas en local. La documentación está preparada; los estados y adjuntos de Jira no se actualizan automáticamente. El video lo realiza otro integrante como evidencia complementaria. No hace falta organizar una reunión para utilizar el registro escrito.
+Las cinco tareas funcionales están implementadas y comprobadas en local. La documentación está preparada; los estados y adjuntos de Jira no se actualizan automáticamente. No hace falta organizar una reunión para utilizar el registro escrito.
 
 Como complemento visual, `/` muestra el inicio con portada, buscador, información del hotel, experiencias, habitaciones destacadas, amenidades actuales y preguntas frecuentes. **Habitaciones** abre `/habitaciones`, donde se conserva el catálogo completo con sus filtros laterales y dos columnas en escritorio. El buscador lleva fechas y huéspedes a los filtros del catálogo; las fechas se conservan al continuar al detalle y la reserva. Este complemento no se presenta como una tarea adicional de Jira ni cambia el conteo de las 22 evidencias de las tareas.
 
@@ -27,7 +27,7 @@ Se comprobaron siete recorridos del inicio y la navegación: datos reales del ca
 
 Requisitos: **Node.js 22**, npm y Docker con Docker Compose. Ejecutar los comandos desde la raíz del repositorio salvo donde se indique. Los datos de demostración se preparan en una base local separada de Atlas.
 
-Cuando `sprint4` ya esté subida, en una carpeta nueva:
+La rama `sprint4` ya está publicada. En una carpeta nueva:
 
 ```bash
 git clone --branch sprint4 https://github.com/Anheoroz/StarHotel.git StarHotel-sprint4
@@ -224,18 +224,22 @@ Secuencia de integración: conservar ambas ramas; unir en una rama aparte; resol
 
 ## Atlas, publicación y material de presentación
 
-La [guía de Atlas](atlas.md) documenta **la preparación del Sprint 3 en `starthotel_db`**. Es un antecedente, no una confirmación del clúster nuevo. El comando `db:atlas` de esta versión exige ese nombre de base; no sirve como selector automático de cualquier base del equipo.
+Se utilizará **el clúster original del equipo**, con la base **`starthotel_db`** preparada en el Sprint 3 y documentada en la [guía de Atlas](atlas.md). El clúster alternativo creado para una demostración no se utilizará. `starhotel` es otra base del mismo clúster original, conservada para la versión anterior; elegir el clúster original no significa volver a esa base. El comando `db:atlas` selecciona el perfil privado de `starthotel_db`.
 
-Si el destino tiene otro nombre, el responsable puede configurar la aplicación con las variables de producción de la [guía de despliegue](despliegue.md), usando `EXPECTED_DB_NAME` igual al nombre real. Antes debe comprobar los formatos de usuarios y el inventario descritos arriba, y respaldar el destino. **Cambiar la URI no convierte hashes, roles ni habitaciones, ni copia datos.** No ejecutar `seed` ni `setup:local` en Atlas; no trasladar sesiones ni usar las cuatro cuentas de demo como reemplazo de usuarios existentes.
+Se ejecutó `npm run db:check` sobre `starthotel_db` mediante el perfil privado del clúster original: el resultado fue compatible, sin modificar documentos ni índices. Esto comprueba la estructura actual, pero no sustituye el arranque de la API ni la prueba funcional del Sprint 4 en Atlas. La colección e índice de reservas aún no están preparados en ese destino; el arranque de la API prepara los índices necesarios. La base anterior `starhotel` conserva otro formato de usuarios y carece del inventario físico que necesita esta versión.
+
+Antes de usar esta versión sobre Atlas, repetir `npm run db:check` si cambió la base y conservar un respaldo antes de realizar cambios. Para publicar se utilizan las variables de la [guía de despliegue](despliegue.md), con `EXPECTED_DB_NAME=starthotel_db` y la conexión privada correspondiente. **Cambiar la URI no convierte hashes, roles ni habitaciones, ni copia datos.** No ejecutar `seed` ni `setup:local` en Atlas; no trasladar sesiones ni usar las cuatro cuentas de demo como reemplazo de usuarios existentes.
+
+Para SCRUM-17, el ingeniero pidió mostrar la base del proyecto en el panel de Atlas del clúster original: quien tenga acceso debe capturar `starthotel_db` y sus colecciones, sin credenciales, y adjuntar las imágenes a Jira. Las capturas de una base del clúster alternativo no corresponden a la base que utilizará esta entrega. La preparación del Sprint 3 y la comprobación de estructura no sustituyen la prueba funcional de esta versión.
 
 Para dar por comprobada la parte de infraestructura, quien publique debe conservar:
 
-1. Nombre de la base acordada y verificación del estado de la API, sin publicar la cadena de conexión.
+1. Verificación del estado de la API conectada a `starthotel_db`, sin publicar la cadena de conexión.
 2. URL HTTPS de la web y URL de la API.
 3. Resultado de la demo completa desde otra computadora, con sesión, amenidades, reserva y pago simulado.
 4. Capturas remotas y enlaces adjuntos a SCRUM-17 y SCRUM-32, distinguiéndolos de las pruebas locales.
 
-El autor comparte **por separado** `Informe_Sprint_4_StarHotel.docx`, su PDF y la carpeta `docs/evidencias/sprint-4/`, con las 22 imágenes organizadas por Jira. El informe identifica al **Grupo No. 1** y contiene el registro escrito de SCRUM-33; el video se agrega cuando esté disponible. Esos materiales personales, los respaldos, `.env`, `.local` y las credenciales permanecen excluidos de GitHub.
+El autor comparte **por separado** `Informe_Sprint_4_StarHotel.docx`, su PDF y la carpeta `docs/evidencias/sprint-4/`, con las 22 imágenes organizadas por Jira. El informe identifica al **Grupo No. 1** y contiene el registro escrito de SCRUM-33. Esos materiales personales, los respaldos, `.env`, `.local` y las credenciales permanecen excluidos de GitHub.
 
 El informe incluye además un anexo del nuevo inicio con tres imágenes. La carpeta personal `INICIO-complemento/` conserva esas capturas, una vista completa y su verificación, separadas de las 22 evidencias por tarea.
 

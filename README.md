@@ -4,9 +4,9 @@ Sistema de catálogo y reservas de habitaciones. La página de inicio presenta e
 
 El proyecto permite explorar el catálogo, consultar disponibilidad, reservar de una a cuatro habitaciones y completar un pago simulado, con los datos guardados en MongoDB. La referencia visual es el prototipo [star-hotel-catalog.lovable.app](https://star-hotel-catalog.lovable.app/).
 
-Durante el **Sprint 3** se preparó una base independiente **`starthotel_db` en MongoDB Atlas** para la demo. [docs/atlas.md](docs/atlas.md) documenta esa preparación y los perfiles privados. El equipo debe confirmar el destino actual antes de usarlo con esta entrega.
+Se utilizará **el clúster original del equipo en MongoDB Atlas**, con la base **`starthotel_db`** preparada durante el Sprint 3. La base anterior `starhotel` se conserva por separado; el clúster alternativo que se creó para una demostración no se utilizará. [docs/atlas.md](docs/atlas.md) explica cómo seleccionar el perfil privado y comprobar la conexión.
 
-El **Sprint 4** se desarrolla y comprueba en local. La configuración final de Atlas debe confirmarse con el responsable del equipo antes de integrar sus datos. [docs/despliegue.md](docs/despliegue.md) contiene las variables, los pasos de publicación y las comprobaciones pendientes de realizar en la nube.
+Las funciones del **Sprint 4** se probaron en local y la estructura de `starthotel_db` se comprobó en Atlas mediante una consulta de solo lectura, con resultado compatible. Queda iniciar y probar esta versión con Atlas y adjuntar a Jira las capturas de la base en el panel del clúster original, como pidió el ingeniero. [docs/despliegue.md](docs/despliegue.md) contiene las variables, los pasos de publicación y las comprobaciones pendientes de realizar en la nube.
 
 **Para recibir y continuar esta entrega, empezar por [docs/entrega-sprint4.md](docs/entrega-sprint4.md).** Incluye preparación local, cuentas, recorrido de demo, comprobación de la base y diferencias con la otra versión del equipo. La rama `sprint4` conserva nuestro Sprint 3 e incorpora el inicio inspirado en `sprint-3-marvin`, con el estilo actual. La unión completa de ambas versiones sigue pendiente.
 
